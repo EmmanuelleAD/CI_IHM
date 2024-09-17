@@ -1,0 +1,22 @@
+<div class="container">
+  <div class="header">
+    <h2>Enter how many you are</h2>
+  </div>
+
+  <div class="counter-section">
+    <button class="decrement" (click)="decrement()">-</button>
+    <div class="count-display">{{ count }}</div>  <!-- Display the current count -->
+    <button class="increment" (click)="increment()">+</button>
+  </div>
+
+  <div class="number-pad">
+    <!-- Number buttons for 1 to 9 -->
+    <button *ngFor="let num of [1, 2, 3]" (click)="appendNumber(num.toString())">{{ num }}</button>
+    <button *ngFor="let num of [4, 5, 6]" (click)="appendNumber(num.toString())">{{ num }}</button>
+    <button *ngFor="let num of [7, 8, 9]" (click)="appendNumber(num.toString())">{{ num }}</button>
+    <button (click)="clearNumber()">C</button> <!-- Clear button -->
+    <button (click)="appendNumber('0')">0</button> <!-- Zero button -->
+    <button (click)="deleteLast()">←</button> <!-- Backspace/Delete button -->
+  </div>
+</div>
+
