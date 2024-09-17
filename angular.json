@@ -32,9 +32,13 @@
               }
             ],
             "styles": [
+              "node_modules/bootstrap/scss/bootstrap.scss",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "src/styles.scss"
             ],
-            "scripts": [],
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ],
             "server": "src/main.server.ts",
             "prerender": true,
             "ssr": {
@@ -61,7 +65,40 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "bff": {
+              "tsConfig": "tsconfig.bff.json",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "4kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "wf": {
+              "tsConfig": "tsconfig.wf.json",              
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "4kB"
+                }
+              ],
+              "outputHashing": "all"
             }
+            
           },
           "defaultConfiguration": "production"
         },
@@ -73,6 +110,12 @@
             },
             "development": {
               "buildTarget": "front:build:development"
+            },
+            "bff": {
+              "buildTarget": "front:build:bff"
+            },
+            "wf": {
+              "buildTarget": "front:build:wf"
             }
           },
           "defaultConfiguration": "development"
@@ -103,5 +146,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
