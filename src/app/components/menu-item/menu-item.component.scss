@@ -1,0 +1,16 @@
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espace entre l'image et le texte */
+  
+    .item-image {
+      width: 100px; /* Ajuste la largeur de l'image */
+      height: auto; /* Conserve les proportions de l'image */
+      border-radius: 8px; /* Coins arrondis */
+    }
+  
+    .item-name {
+      font-size: 18px; /* Taille de la police du nom du repas */
+      font-weight: bold; /* Texte en gras */
+    }
+  }
