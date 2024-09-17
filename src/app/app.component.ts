@@ -1,5 +1,7 @@
+
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TestService } from '@services/test.service';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +11,9 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'front';
+  title: string;
+
+  constructor(private testService: TestService) {
+    this.title = this.testService.getHelloWorld(); // Use 'this' to refer to the class property
+  }
 }

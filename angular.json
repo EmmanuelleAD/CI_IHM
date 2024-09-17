@@ -61,7 +61,40 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "bff": {
+              "tsConfig": "tsconfig.bff.json",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "4kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "wf": {
+              "tsConfig": "tsconfig.wf.json",              
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "4kB"
+                }
+              ],
+              "outputHashing": "all"
             }
+            
           },
           "defaultConfiguration": "production"
         },
@@ -73,6 +106,12 @@
             },
             "development": {
               "buildTarget": "front:build:development"
+            },
+            "bff": {
+              "buildTarget": "front:build:bff"
+            },
+            "wf": {
+              "buildTarget": "front:build:wf"
             }
           },
           "defaultConfiguration": "development"
