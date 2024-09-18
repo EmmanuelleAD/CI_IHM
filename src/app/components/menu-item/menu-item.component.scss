@@ -1,16 +1,34 @@
+.menu-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
 .menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* Espace entre l'image et le texte */
-  
-    .item-image {
-      width: 100px; /* Ajuste la largeur de l'image */
-      height: auto; /* Conserve les proportions de l'image */
-      border-radius: 8px; /* Coins arrondis */
-    }
-  
-    .item-name {
-      font-size: 18px; /* Taille de la police du nom du repas */
-      font-weight: bold; /* Texte en gras */
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.item-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.item-details {
+  margin-top: 10px;
+}
+
+.item-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}

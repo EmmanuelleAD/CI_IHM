@@ -1,5 +1,7 @@
 <p>menu-item works!</p>
 <div class="menu-item">
-    <img [src]="itemImageUrl" alt="{{ itemName }}" class="item-image">
-    <h2 class="item-name">{{ itemName }}</h2>
-</div>
+    <img [src]="item.image" alt="{{item.fullName}}" class="item-image">
+    <div class="item-details">
+      <h3 class="item-name">{{item.fullName}}</h3>
+    </div>
+  </div>
