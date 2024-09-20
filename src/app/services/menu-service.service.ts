@@ -11,7 +11,10 @@ export class MenuServiceService {
   getAllItems(){
     return this.http.get('http://localhost:9500/menu/menus');
   }
-  
+
+  getItems(type: string) {
+    return this.http.get(`http://localhost:3000/menu?type=${type}`);
+  }
 
 
 }

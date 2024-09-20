@@ -21,12 +21,24 @@ export class MenuComponent implements OnInit{
   }
 
   displayAllItems(){
-    console.log('displayAllItems');
+    //console.log('displayAllItems');
     this.menuServiceService.getAllItems().subscribe((data: any) => {
+      //console.log(data);
       this.items=data;
     },
     error => {
       console.error('Error fetching items', error);
+    });
+  }
+
+  displayItemsByType(type: string) {
+    console.log(`displayItemsByType: ${type}`);
+    this.menuServiceService.getItems(type).subscribe((data: any) => {
+      console.log(data);
+      this.items = data;  // Met à jour les items affichés selon le type sélectionné
+    },
+    error => {
+      console.error(`Error fetching ${type} items`, error);
     });
   }
 

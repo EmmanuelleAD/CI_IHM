@@ -1,4 +1,14 @@
-<p>menu works!</p>
+<p>Menu works!</p>
+
+<!-- Boutons pour filtrer les items par catégorie -->
+<div class="filter-buttons">
+  <button (click)="displayAllItems()">All</button>
+  <button (click)="displayItemsByType('STARTER')">Starters</button>
+  <button (click)="displayItemsByType('MAIN')">Main</button>
+  <button (click)="displayItemsByType('BEVERAGE')">Drinks</button>
+</div>
+
+<!-- Conteneur d'items du menu -->
 <div class="menu-container">
-    <app-menu-item *ngFor="let item of items" [item]="item"></app-menu-item>
+  <app-menu-item *ngFor="let item of items" [item]="item"></app-menu-item>
 </div>
