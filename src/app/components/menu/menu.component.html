@@ -23,4 +23,13 @@
       </div>
     </div>
 </div>
+
+<div class="cart" *ngIf="cart.length > 0" (click)="onCartClick()">
+    <h2>Your Cart</h2>
+    <div *ngFor="let item of cart">
+      <p>{{ item.fullName }} - Quantity: {{ item.quantity }}</p>
+    </div>
+    <p>Total: {{ getTotal() }} €</p> 
+    <button (click)="validateCart()">Validate Cart</button>
+</div>
   
