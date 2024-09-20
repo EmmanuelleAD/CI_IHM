@@ -8,7 +8,19 @@
   <button (click)="displayItemsByType('BEVERAGE')">Drinks</button>
 </div>
 
-<!-- Conteneur d'items du menu -->
+
 <div class="menu-container">
-  <app-menu-item *ngFor="let item of items" [item]="item"></app-menu-item>
+    <div *ngFor="let item of items" class="menu-item">
+      <app-menu-item 
+        [item]="item" 
+        (quantityChanged)="handleQuantityChange($event)">
+      </app-menu-item>
+  
+      <div class="quantity-controls">
+        <button (click)="decreaseQuantity(item)">−</button>
+        <span>{{ item.quantity }}</span>
+        <button (click)="increaseQuantity(item)">+</button>
+      </div>
+    </div>
 </div>
+  

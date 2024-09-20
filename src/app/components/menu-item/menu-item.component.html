@@ -1,7 +1,9 @@
 <p>menu-item works!</p>
 <div class="menu-item">
-    <img [src]="item.image" alt="{{item.fullName}}" class="item-image">
-    <div class="item-details">
-      <h3 class="item-name">{{item.fullName}}</h3>
-    </div>
+  <img [src]="item.image" alt="{{ item.fullName }}" class="item-image">
+  <div class="item-details">
+    <h3 class="item-name">{{ item.fullName }}</h3>
+    <p>Prix : {{ item.price }} €</p>
+    <p>Catégorie : {{ item.category }}</p>
   </div>
+</div>
