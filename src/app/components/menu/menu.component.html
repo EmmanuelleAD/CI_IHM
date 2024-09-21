@@ -3,19 +3,16 @@
 <!-- Boutons pour filtrer les items par catégorie -->
 <div class="filter-buttons">
   <button (click)="displayAllItems()">All</button>
-  <button (click)="displayItemsByType('STARTER')">Starters</button>
-  <button (click)="displayItemsByType('MAIN')">Main</button>
-  <button (click)="displayItemsByType('BEVERAGE')">Drinks</button>
 </div>
 
 
 <div class="menu-container">
     <div *ngFor="let item of items" class="menu-item">
-      <app-menu-item 
-        [item]="item" 
+      <app-menu-item
+        [item]="item"
         (quantityChanged)="handleQuantityChange($event)">
       </app-menu-item>
-  
+
       <div class="quantity-controls">
         <button (click)="decreaseQuantity(item)">−</button>
         <span>{{ item.quantity }}</span>
@@ -29,7 +26,6 @@
     <div *ngFor="let item of cart">
       <p>{{ item.fullName }} - Quantity: {{ item.quantity }}</p>
     </div>
-    <p>Total: {{ getTotal() }} €</p> 
+    <p>Total: {{ getTotal() }} €</p>
     <button (click)="validateCart()">Validate Cart</button>
 </div>
-  

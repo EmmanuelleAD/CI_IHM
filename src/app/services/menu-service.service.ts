@@ -13,7 +13,7 @@ export class MenuServiceService {
   }
 
   getItems(type: string) {
-    return this.http.get(`http://localhost:3000/menu?type=${type}`);
+
   }
 
 

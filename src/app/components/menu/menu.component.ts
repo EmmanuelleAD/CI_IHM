@@ -19,7 +19,7 @@ export class MenuComponent implements OnInit{
 
   ngOnInit() {
     this.displayAllItems();
-    this.loadCart(); 
+    this.loadCart();
   }
 
   displayAllItems(){
@@ -39,19 +39,6 @@ export class MenuComponent implements OnInit{
   }
 
   displayItemsByType(type: string) {
-    console.log(`displayItemsByType: ${type}`);
-    this.menuServiceService.getItems(type).subscribe((data: any) => {
-      this.items = data.map((item: MenuItem) => {
-        const cartItem = this.cart.find(i => i._id === item._id);
-        return {
-          ...item,
-          quantity: cartItem ? cartItem.quantity : 0  // Charger la quantité sauvegardée ou initialiser à 0
-        };
-      });
-    },
-    error => {
-      console.error(`Error fetching ${type} items`, error);
-    });
   }
 
 
@@ -95,14 +82,14 @@ export class MenuComponent implements OnInit{
     const existingItem = this.cart.find(i => i._id === item._id);
     if (item.quantity > 0) {
       if (existingItem) {
-        existingItem.quantity = item.quantity; 
+        existingItem.quantity = item.quantity;
       } else {
-        this.cart.push({ ...item }); 
+        this.cart.push({ ...item });
       }
     } else if (existingItem) {
-      this.cart = this.cart.filter(i => i._id !== item._id); 
+      this.cart = this.cart.filter(i => i._id !== item._id);
     }
-    this.updateLocalStorage(); 
+    this.updateLocalStorage();
   }
 
   validateCart() {
@@ -119,7 +106,7 @@ export class MenuComponent implements OnInit{
     return total;
   }
 
-  
+
   onCartClick(): void {
     console.log('Cart clicked!');
 
