@@ -1,0 +1,22 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "./",
+        "outDir": "./out-tsc/app",
+        "types": [
+          "node"
+        ],
+        "paths": {
+            "@services/*": ["./src/app/services/bff_services/*"]
+        }
+      },
+    "files": [
+      "src/main.ts",
+      "src/main.server.ts",
+      "server.ts"
+    ],
+    "include": [
+      "src/**/*.d.ts"
+    ]
+  }
+  

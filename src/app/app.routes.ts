@@ -1,14 +1,23 @@
-import {RouterModule, Routes} from '@angular/router';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+import { MenuComponent } from './components/menu/menu.component';
+import { TableReservationComponent } from './components/table-reservation/table-reservation.component';
+import { HomeComponent } from './components/home/home.component';
 import {CustomerCountComponent} from "./Customer_count/customer-count/customer-count.component";
-import {NgModule} from "@angular/core";
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/customer-count', pathMatch: 'full' },
-  { path: 'customer-count', component: CustomerCountComponent},
-]
+    { path: '', component: HomeComponent },
+    { path: 'menu', component: MenuComponent},
+    { path: 'table-reservation', component: TableReservationComponent },
+  { path: 'customer-count', component: CustomerCountComponent }
+
+
+];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],  // Configurez les routes avec RouterModule
-  exports: [RouterModule]  // Exportez RouterModule pour l'utiliser dans d'autres modules
-})
-export class AppRoutingModule { }
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule]
+  })
+  export class AppRoutingModule {
+  }
