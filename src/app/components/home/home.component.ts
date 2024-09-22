@@ -1,14 +1,20 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { Router } from '@angular/router'; 
+import {MatCardModule} from '@angular/material/card';
+import {MatButton} from '@angular/material/button';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterModule],
+  imports: [MatCardModule,MatButton],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  styleUrl: './home.component.css'
 })
 export class HomeComponent {
 
-  constructor() {}
+  constructor(private router: Router) {}
+
+  navigateToNextPage() {
+    this.router.navigate(['/customer-count']);
+  }
 }

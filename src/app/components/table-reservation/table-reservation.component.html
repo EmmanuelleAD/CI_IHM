@@ -1,1 +1,19 @@
-<p>table-reservation works!</p>
+<div class="container">
+    <mat-card class="home-card" appearance="outlined">
+        <mat-card-header>
+            <div mat-card-avatar class="example-header-image"></div>
+            <mat-card-title>Choose your tables</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+<div class="tables-container grid" *ngFor="let table of tables" >
+    <div class="col-3">
+        <app-table  [number]="table.number" [taken]="table.taken"></app-table>
+    </div>
+</div>
+        </mat-card-content>
+
+
+    </mat-card>
+
+
+</div>
