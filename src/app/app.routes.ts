@@ -6,10 +6,18 @@ import { TableReservationComponent } from './components/table-reservation/table-
 import { HomeComponent } from './components/home/home.component';
 import {CustomerCountComponent} from "./components/customer-count/customer-count.component";
 import {PaymentComponent} from "./components/payment/payment.component";
+import {CategoryComponent} from "./components/category/category.component";
+import {TableCategoriesComponent} from "./components/table-categories/table-categories.component";
+import {HeaderComponent} from "./components/header/header.component";
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'menu', component: MenuComponent},
+    { path: 'table-reservation', component: TableReservationComponent },
+  { path: 'customer-count', component: CustomerCountComponent },
+  { path: 'category', component: CategoryComponent },
+  { path: 'table-categories', component: TableCategoriesComponent },
+  { path: 'header', component: HeaderComponent },
   { path: 'table-reservation/:count', component: TableReservationComponent },
   { path: 'customer-count', component: CustomerCountComponent },
   { path: 'payment', component: PaymentComponent }
