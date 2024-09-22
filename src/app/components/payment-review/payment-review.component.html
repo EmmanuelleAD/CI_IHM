@@ -1,0 +1,33 @@
+<div class="container">
+  <h2>Payment Review for Table {{ tableNumber }}</h2>
+
+
+  <div *ngIf="selectedMode === 'person'">
+    <label>Select Person: </label>
+    <select [(ngModel)]="selectedPerson">
+      <option *ngFor="let person of persons" [value]="person">{{ person.name }}</option>
+    </select>
+  </div>
+  <p>Selected Mode: {{ selectedMode }}</p>
+
+  <div *ngIf="selectedMode === 'all'">
+    <p>Table Number: {{ tableNumber }}</p>
+    <p>Total Amount: {{ totalAmount }} €</p>
+  </div>
+
+
+  <div>
+    <h3>Order Items</h3>
+    <ul>
+      <li *ngFor="let item of orderItems">
+        {{ item.quantity }} x {{ item.name }}
+      </li>
+    </ul>
+  </div>
+
+
+  <div class="actions">
+    <button (click)="pay()">Pay</button>
+    <button (click)="review()">Review</button>
+  </div>
+</div>

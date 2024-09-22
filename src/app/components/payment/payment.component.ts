@@ -17,12 +17,12 @@ export class PaymentComponent {
 
 
   payAll() {
+    this.router.navigate(['/payment-review',"all",this.tableNumber]);
 
-    console.log('Pay all the table');
   }
 
 
   paySeparately() {
-    console.log('Pay separately');
+    this.router.navigate(['/payment-review',"person",this.tableNumber]);
   }
 }

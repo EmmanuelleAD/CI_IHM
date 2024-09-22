@@ -9,6 +9,7 @@ import {PaymentComponent} from "./components/payment/payment.component";
 import {CategoryComponent} from "./components/category/category.component";
 import {TableCategoriesComponent} from "./components/table-categories/table-categories.component";
 import {HeaderComponent} from "./components/header/header.component";
+import {PaymentReviewComponent} from "./components/payment-review/payment-review.component";
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -20,7 +21,9 @@ export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
   { path: 'table-reservation/:count', component: TableReservationComponent },
   { path: 'customer-count', component: CustomerCountComponent },
-  { path: 'payment', component: PaymentComponent }
+  { path: 'payment', component: PaymentComponent },
+  { path: 'payment-review/:selectedMode/:tableNumber', component: PaymentReviewComponent }
+
 
 
 ];
