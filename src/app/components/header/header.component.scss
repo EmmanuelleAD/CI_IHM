@@ -1,0 +1,17 @@
+
+.category{
+  width: 30%;
+  height: auto;
+  align-self: center;
+}
+mat-toolbar{
+/*  display: flex;
+justify-content: space-between;
+ align-items: flex-start;
+  height: 6em;*/
+  display: flex; /* Utilise Flexbox pour aligner les éléments */
+  flex-wrap: wrap; /* Permet aux catégories de passer à la ligne si nécessaire */
+  justify-content: space-around; /* Espace égal entre les éléments */
+ // padding: 10px;
+  height: auto;
+}
