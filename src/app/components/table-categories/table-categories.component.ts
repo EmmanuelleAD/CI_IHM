@@ -4,6 +4,7 @@ import {Category} from "../../interfaces/Category";
 import {CATEGORIES} from "../../constants";
 import {NgForOf} from "@angular/common";
 import {HeaderComponent} from "../header/header.component";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-table-categories',
@@ -11,7 +12,8 @@ import {HeaderComponent} from "../header/header.component";
   imports: [
     CategoryComponent,
     NgForOf,
-    HeaderComponent
+    HeaderComponent,
+    RouterLink
   ],
   templateUrl: './table-categories.component.html',
   styleUrl: './table-categories.component.scss'
