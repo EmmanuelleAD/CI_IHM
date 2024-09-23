@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {BehaviorSubject, Observable} from "rxjs";
 import {MenuItem} from "../interfaces/MenuItem";
-import {Menu} from "@angular/cdk/menu";
 
 @Injectable({
   providedIn: 'root'

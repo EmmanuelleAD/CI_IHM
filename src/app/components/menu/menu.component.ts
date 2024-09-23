@@ -1,5 +1,5 @@
 import { Component, OnInit  } from '@angular/core';
-import { MenuItemComponent } from '../../../../src/app/components/menu-item/menu-item.component';
+import { MenuItemComponent } from '../menu-item/menu-item.component';
 import { MenuServiceService } from '../../services/menu-service.service';
 import { CommonModule } from '@angular/common';
 import { MenuItem } from '../../interfaces/MenuItem';
