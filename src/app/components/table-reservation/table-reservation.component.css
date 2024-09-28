@@ -12,3 +12,17 @@
 
 
 }
+.table{
+  width: 150px;
+  height: 150px;
+  padding-left: 20px;
+}
+.taken {
+  background-color: grey;
+  color: white;
+}
+
+.available {
+  background-color: green;
+  color: white;
+}
