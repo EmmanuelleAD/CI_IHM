@@ -1,52 +1,158 @@
-.container {
-  padding: 20px;
-  background-color: #f5f5f5;
-  border-radius: 5px;
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-h2, h3 {
-  color: #333;
-}
-
-label {
+h3 {
+  text-align: center;
+  font-size: 24px;
   font-weight: bold;
-}
-
-select {
-  margin-top: 10px;
-  padding: 5px;
-  width: 100%;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-ul li {
-  background-color: #fff;
-  padding: 10px;
-  margin-bottom: 5px;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-}
-
-.actions {
   margin-top: 20px;
 }
 
-button {
-  padding: 10px 15px;
-  margin-right: 10px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+/* Style pour le statut payé et non payé */
+.paid {
+  color: #28a745; /* Vert pour 'payée' */
+  font-weight: bold;
 }
 
-button:hover {
-  background-color: #45a049;
+.unpaid {
+  color: #dc3545; /* Rouge pour 'non payée' */
+  font-weight: bold;
 }
+.client-list {
+  display: flex;
+  justify-content: center; /* Centrer les boutons horizontalement */
+  gap: 20px; /* Espacement entre les boutons */
+  margin-top: 20px;
+}
+
+/* Style de base pour les boutons */
+.client-list button {
+  padding: 15px 30px; /* Taille moyenne des boutons */
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center; /* Centrer le texte à l'intérieur du bouton */
+  min-width: 150px; /* Largeur minimale des boutons */
+  max-width: 200px; /* Largeur maximale des boutons */
+}
+
+/* Couleur de base pour les boutons non sélectionnés */
+.client-list button.default {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+/* Effet au survol sur les boutons non sélectionnés */
+.client-list button.default:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px);
+}
+
+/* Style pour les boutons sélectionnés */
+.client-list button.selected {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+}
+
+/* Effet au survol pour les boutons sélectionnés */
+.client-list button.selected:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+/* Style pour les boutons lorsque le client a payé */
+.client-list button.paid {
+  background-color: #28a745;
+  color: white;
+  border: 1px solid #28a745;
+  pointer-events: none; /* Désactiver les clics pour les clients qui ont déjà payé */
+}
+
+
+.client-list button.paid:hover {
+  transform: none;
+}
+
+
+.order-details {
+  margin-top: 30px;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  text-align: center; /* Centrer le texte à l'intérieur de la table */
+}
+
+/* Table dans les détails de la commande */
+.order-details table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+/* Style des cellules et en-têtes du tableau */
+.order-details th, .order-details td {
+  padding: 15px;
+  border: 1px solid #ddd;
+  text-align: center; /* Centrer le texte dans les cellules */
+}
+
+/* Style des en-têtes du tableau */
+.order-details th {
+  background-color: #007bff;
+  color: white;
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+
+/* Style des cellules des détails */
+.order-details td {
+  font-size: 16px;
+  color: #555;
+}
+
+/* Style pour les montants totaux */
+.order-details .total {
+  font-weight: bold;
+  font-size: 18px;
+  text-align: right;
+  padding: 15px 10px;
+}
+
+/* Transition douce sur les éléments */
+.client-list button, .order-details table {
+  transition: all 0.3s ease;
+}
+/* Conteneur pour centrer le bouton de paiement */
+.payment-button-container {
+  display: flex;
+  justify-content: center; /* Centrer horizontalement */
+  margin-top: 30px; /* Espace en haut du bouton */
+}
+
+
+.payment-button {
+  padding: 15px 60px;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+
+.payment-button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+
+
+

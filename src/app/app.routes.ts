@@ -5,7 +5,6 @@ import { MenuComponent } from './components/menu/menu.component';
 import { TableReservationComponent } from './components/table-reservation/table-reservation.component';
 import { HomeComponent } from './components/home/home.component';
 import {CustomerCountComponent} from "./components/customer-count/customer-count.component";
-import {PaymentComponent} from "./components/payment/payment.component";
 import {CategoryComponent} from "./components/category/category.component";
 import {TableCategoriesComponent} from "./components/table-categories/table-categories.component";
 import {HeaderComponent} from "./components/header/header.component";
@@ -21,8 +20,7 @@ export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
   { path: 'table-reservation/:count', component: TableReservationComponent },
   { path: 'customer-count', component: CustomerCountComponent },
-  { path: 'payment', component: PaymentComponent },
-  { path: 'payment-review/:selectedMode/:tableNumber', component: PaymentReviewComponent }
+  { path: 'payment-review/:tableNumber', component: PaymentReviewComponent }
 
 
 
