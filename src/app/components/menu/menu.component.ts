@@ -1,13 +1,14 @@
 import { Component, OnInit  } from '@angular/core';
-import { MenuItemComponent } from '../../../../src/app/components/menu-item/menu-item.component';
+import { MenuItemComponent } from '../menu-item/menu-item.component';
 import { MenuServiceService } from '../../services/menu-service.service';
 import { CommonModule } from '@angular/common';
 import { MenuItem } from '../../interfaces/MenuItem';
+import {HeaderComponent} from "../header/header.component";
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule,MenuItemComponent],
+  imports: [CommonModule, MenuItemComponent, HeaderComponent],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
@@ -18,7 +19,17 @@ export class MenuComponent implements OnInit{
   constructor(  public menuServiceService: MenuServiceService) {}
 
   ngOnInit() {
-    this.displayAllItems();
+  this.menuServiceService.items$.subscribe(
+    (data: any) => {
+      this.items = data.map((item: MenuItem) => {
+        const cartItem = this.cart.find(i => i._id === item._id);
+        return {
+          ...item,
+          quantity: cartItem ? cartItem.quantity : 0  // Charger la quantité sauvegardée ou initialiser à 0
+        };
+      });
+    }
+  )
     this.loadCart();
   }
 
