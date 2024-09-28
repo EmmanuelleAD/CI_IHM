@@ -20,7 +20,7 @@ export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
   { path: 'table-reservation/:count', component: TableReservationComponent },
   { path: 'customer-count', component: CustomerCountComponent },
-  { path: 'payment-review/:tableNumber', component: PaymentReviewComponent }
+  { path: 'payment-review/:orderId/:tableNumber', component: PaymentReviewComponent }
 
 
 

@@ -19,6 +19,7 @@ export class PaymentReviewComponent {
   selectedClients: any[] = [];
   storage: Storage | null = null;
   tableNumber: number | null = null;
+  commandId: number | undefined;
 
   constructor(
       private route: ActivatedRoute,
@@ -34,23 +35,27 @@ export class PaymentReviewComponent {
 
     this.route.params.subscribe(params => {
       this.tableNumber = +params['tableNumber'];
+      this.commandId= +params['orderId'];
       console.log("Table Number from URL:", this.tableNumber);
       this.loadCommandFromFile();  // Charger les données JSON depuis le serveur
     });
   }
-
-
   loadCommandFromFile() {
     const jsonFilePath = 'assets/Commands.json';
 
     this.http.get<any>(jsonFilePath).subscribe(
         data => {
-          this.command = data[0];
+
+          this.command = data.find((cmd: any) => cmd.commandId === this.commandId);
           console.log('Command after loading from file:', this.command);
 
-          this.selectedTable = this.command.tables.find((table: any) => +table.tableNumber === this.tableNumber);
-          if (!this.selectedTable) {
-            console.error("Table non trouvée pour le numéro :", this.tableNumber);
+          if (this.command) {
+            this.selectedTable = this.command.tables.find((table: any) => +table.tableNumber === this.tableNumber);
+            if (!this.selectedTable) {
+              console.error("Table non trouvée pour le numéro :", this.tableNumber);
+            }
+          } else {
+            console.error("Commande non trouvée pour l'ID :", this.commandId);
           }
         },
         error => {
