@@ -13,7 +13,6 @@ import {PaymentReviewComponent} from "./components/payment-review/payment-review
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'menu', component: MenuComponent},
-    { path: 'table-reservation', component: TableReservationComponent },
   { path: 'customer-count', component: CustomerCountComponent },
   { path: 'category', component: CategoryComponent },
   { path: 'table-categories', component: TableCategoriesComponent },

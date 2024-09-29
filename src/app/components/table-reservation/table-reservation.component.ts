@@ -6,11 +6,11 @@ import { MatCheckbox } from "@angular/material/checkbox";
 import { NgForOf } from "@angular/common";
 import { CommonModule } from '@angular/common';
 
-import { Table } from '../../model/model';
+import { Table } from '../../model/model';  // Ensure this model is updated according to your backend response
 
 import { FormsModule } from '@angular/forms';
 import { TableComponent } from "../shared/table/table.component";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
   selector: 'app-table-reservation',
@@ -28,44 +28,41 @@ import { ActivatedRoute } from "@angular/router";
     FormsModule
   ],
   templateUrl: './table-reservation.component.html',
-  styleUrls: ['./table-reservation.component.css'] // Use styleUrls, not styleUrl
+  styleUrls: ['./table-reservation.component.css']
 })
 export class TableReservationComponent {
-  serverLink: string = "http://localhost:9500/";
-  tables: Table[] = [
-    { number: '1', taken: true, selected: false },
-    { number: '2', taken: false, selected: false },
-    { number: '3', taken: false, selected: false },
-    { number: '4', taken: false, selected: false },
-    { number: '5', taken: false, selected: false },
-    { number: '6', taken: false, selected: false }
-  ] as Table[];
+  backendUrl: string = "http://localhost:3001/tables";  // Updated backend URL
+
+  tables: Table[] = [];  // Initialize with empty array
 
   numberOfCustomers: number = 0;
   numberOfTables: number = 0;
   selectedCount: number = 0;
 
-  constructor(private route: ActivatedRoute, private http: HttpClient) { }
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
-    // Fetching tables from the server
-    this.http.get<Table[]>(this.serverLink + "dining/tables").subscribe({
+    // Fetch tables directly from the backend using the correct URL
+    this.http.get<Table[]>(this.backendUrl).subscribe({
       next: (response: Table[]) => {
-        this.tables = response;
-        console.log('Fetched tables:', response);
+        this.tables = response;  // Assign the response to the tables array
+        console.log('Fetched tables from backend:', response);
       },
       error: (error: any) => {
-        console.error("Error fetching tables:", error);
+        console.error("Error fetching tables from backend:", error);
       }
     });
 
-    // Retrieving the 'count' parameter from the route and using it as 'numberOfCustomers'
     const count = this.route.snapshot.paramMap.get('count');
-    this.numberOfCustomers = count ? Number(count) : 0; // Convert the string to a number
-    this.numberOfTables = Math.ceil(this.numberOfCustomers / 4); // Assuming 4 people per table
+    this.numberOfCustomers = count ? Number(count) : 0;
+    this.numberOfTables = Math.ceil(this.numberOfCustomers / 4);
   }
 
   onSelectionChange() {
     this.selectedCount = this.tables.filter(table => table.selected).length;
+  }
+
+  navigateToNextPage() {
+    this.router.navigate(['/menu']);
   }
 }

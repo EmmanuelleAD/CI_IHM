@@ -16,7 +16,12 @@
               </mat-checkbox>
             </mat-card>
           </div>
-       <button >Validate</button>
+        <button
+          class="start-button"
+          mat-raised-button
+          disabledInteractive
+          (click)="navigateToNextPage()"
+        >Next</button>
 
       </div>
     </mat-card-content>
