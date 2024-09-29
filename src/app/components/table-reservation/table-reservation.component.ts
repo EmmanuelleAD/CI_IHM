@@ -1,16 +1,23 @@
+
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatButton } from "@angular/material/button";
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from "@angular/material/card";
 import { MatCheckbox } from "@angular/material/checkbox";
-import { NgForOf } from "@angular/common";
+import {NgForOf, NgOptimizedImage} from "@angular/common";
 import { CommonModule } from '@angular/common';
-
-import { Table } from '../../model/model';  // Ensure this model is updated according to your backend response
-
-import { FormsModule } from '@angular/forms';
-import { TableComponent } from "../shared/table/table.component";
 import { ActivatedRoute, Router } from "@angular/router";
+import {FormsModule} from "@angular/forms";
+
+interface Table {
+  _id: string;
+  number: number;
+  taken: boolean;
+  tableOrderId: string | null;
+  positionX: number;  // Add X coordinate for table position
+  positionY: number;  // Add Y coordinate for table position
+  selected?: boolean;  // Optional for selection state in the UI
+}
 
 @Component({
   selector: 'app-table-reservation',
@@ -22,19 +29,17 @@ import { ActivatedRoute, Router } from "@angular/router";
     MatCardHeader,
     MatCardTitle,
     MatCheckbox,
-    TableComponent,
     NgForOf,
     CommonModule,
-    FormsModule
+    FormsModule,
+    NgOptimizedImage
   ],
   templateUrl: './table-reservation.component.html',
   styleUrls: ['./table-reservation.component.css']
 })
 export class TableReservationComponent {
-  backendUrl: string = "http://localhost:3001/tables";  // Updated backend URL
-
-  tables: Table[] = [];  // Initialize with empty array
-
+  backendUrl: string = "http://localhost:3001/tables";  // Backend URL
+  tables: Table[] = [];  // Array of tables
   numberOfCustomers: number = 0;
   numberOfTables: number = 0;
   selectedCount: number = 0;
@@ -42,11 +47,15 @@ export class TableReservationComponent {
   constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
-    // Fetch tables directly from the backend using the correct URL
     this.http.get<Table[]>(this.backendUrl).subscribe({
       next: (response: Table[]) => {
-        this.tables = response;  // Assign the response to the tables array
-        console.log('Fetched tables from backend:', response);
+        // Add positions dynamically, for example, in a grid
+        this.tables = response.map((table, index) => ({
+          ...table,
+          positionX: (index % 5) * 120,  // Horizontal position (adjust spacing)
+          positionY: Math.floor(index / 5) * 120  // Vertical position (adjust spacing)
+        }));
+        console.log('Fetched tables from backend:', this.tables);
       },
       error: (error: any) => {
         console.error("Error fetching tables from backend:", error);

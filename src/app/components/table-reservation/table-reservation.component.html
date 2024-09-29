@@ -1,30 +1,31 @@
-<div class="container">
-  <mat-card class="home-card" appearance="outlined">
-    <mat-card-header>
-      <mat-card-title class="mb-4">You can choose up to {{ numberOfTables }} tables</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="tables-container grid">
-        <div class="col-4" *ngFor="let table of tables">
+<div class="restaurant-floorplan">
 
-            <mat-card appearance="outlined" class="table " [ngClass]="{'table-available': !table.taken, 'table-taken': table.taken}">
-              <mat-card-title>Table {{ table.number }}</mat-card-title>
-              <mat-checkbox
-                [(ngModel)]="table.selected"
-                (change)="onSelectionChange()"
-                [disabled]="table.taken || (selectedCount >= numberOfTables && !table.selected)">
-              </mat-checkbox>
-            </mat-card>
-          </div>
-        <button
-          class="start-button"
-          mat-raised-button
-          disabledInteractive
-          (click)="navigateToNextPage()"
-        >Next</button>
+  <div class="kitchen-area">
+    <img src="assets/kitchen.png" alt="Kitchen" class="kitchen-image" />
+  </div>
 
+
+  <div class="bathroom-area">
+    <img src="assets/toilet.png" alt="Bathroom" class="bathroom-image" />
+  </div>
+
+  <div class="selection-info">
+    You can select up to {{ numberOfTables }} tables.
+  </div>
+
+  <!-- Tables Area -->
+  <div class="tables-container">
+    <div *ngFor="let table of tables" class="table">
+      <div class="table-card">
+        <img src="assets/table-chair.png" alt="Table" class="table-image"/>
+        <mat-card-title>Table {{ table.number }}</mat-card-title>
+        <mat-checkbox [(ngModel)]="table.selected" (change)="onSelectionChange()"></mat-checkbox>
       </div>
-    </mat-card-content>
+    </div>
+  </div>
 
-  </mat-card>
+  <!-- Next Button -->
+  <button class="start-button" mat-raised-button [disabled]="selectedCount === 0" (click)="navigateToNextPage()">
+    Next
+  </button>
 </div>
