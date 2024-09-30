@@ -1,3 +1,33 @@
-import { Routes } from '@angular/router';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 
-export const routes: Routes = [];
+import { MenuComponent } from './components/menu/menu.component';
+import { TableReservationComponent } from './components/table-reservation/table-reservation.component';
+import { HomeComponent } from './components/home/home.component';
+import {CustomerCountComponent} from "./components/customer-count/customer-count.component";
+import {CategoryComponent} from "./components/category/category.component";
+import {TableCategoriesComponent} from "./components/table-categories/table-categories.component";
+import {HeaderComponent} from "./components/header/header.component";
+import {PaymentReviewComponent} from "./components/payment-review/payment-review.component";
+
+export const routes: Routes = [
+    { path: '', component: HomeComponent },
+    { path: 'menu', component: MenuComponent},
+  { path: 'customer-count', component: CustomerCountComponent },
+  { path: 'category', component: CategoryComponent },
+  { path: 'table-categories', component: TableCategoriesComponent },
+  { path: 'header', component: HeaderComponent },
+  { path: 'table-reservation/:count', component: TableReservationComponent },
+  { path: 'customer-count', component: CustomerCountComponent },
+  { path: 'payment-review/:orderId/:tableNumber', component: PaymentReviewComponent }
+
+
+
+];
+
+@NgModule({
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule]
+  })
+  export class AppRoutingModule {
+  }

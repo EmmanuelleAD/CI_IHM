@@ -1,0 +1,60 @@
+<div *ngIf="selectedTable">
+    <h3>Table {{ selectedTable?.tableNumber }} - Statut:
+        <span [ngClass]="{'paid': selectedTable.tablePaid, 'unpaid': !selectedTable.tablePaid}">
+      {{ selectedTable.tablePaid ? 'Payée' : 'Non payée' }}
+    </span>
+    </h3>
+
+    <!-- Liste des clients -->
+    <div class="client-list">
+        <button *ngFor="let client of selectedTable?.clients"
+                (click)="toggleClientSelection(client)"
+                [ngClass]="getClientButtonClass(client)">
+            Client {{ client.client }}
+        </button>
+    </div>
+
+    <!-- Détails des commandes des clients sélectionnés -->
+    <div class="order-details" *ngIf="selectedClients.length > 0">
+        <h3>Détails des commandes des clients sélectionnés</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Client</th>
+                <th>Article</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Total par article</th>
+            </tr>
+            </thead>
+            <tbody>
+            <ng-container *ngFor="let client of selectedClients">
+                <tr *ngFor="let item of client.items">
+                    <td>{{ client.client }}</td>
+                    <td>{{ item.itemId }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.price | currency:'EUR' }}</td>
+                    <td>{{ item.quantity * item.price | currency:'EUR' }}</td>
+                </tr>
+            </ng-container>
+            </tbody>
+        </table>
+
+        <!-- Total pour les clients sélectionnés -->
+        <h4>Total des clients sélectionnés : {{ calculateSelectedClientsTotal() | currency:'EUR' }}</h4>
+        <div *ngIf="selectedClients.length > 0">
+
+            <div class="payment-button-container">
+                <button class="payment-button" (click)="payOrder()">Payer</button>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <!-- Message si aucun client n'est sélectionné -->
+    <div *ngIf="selectedClients.length === 0">
+        <p>Aucun client sélectionné.</p>
+    </div>
+</div>

@@ -1,0 +1,31 @@
+<div class="restaurant-floorplan">
+
+  <div class="kitchen-area">
+    <img src="assets/kitchen.png" alt="Kitchen" class="kitchen-image" />
+  </div>
+
+
+  <div class="bathroom-area">
+    <img src="assets/toilet.png" alt="Bathroom" class="bathroom-image" />
+  </div>
+
+  <div class="selection-info">
+    You can select up to {{ numberOfTables }} tables.
+  </div>
+
+  <!-- Tables Area -->
+  <div class="tables-container">
+    <div *ngFor="let table of tables" class="table">
+      <div class="table-card">
+        <img src="assets/table-chair.png" alt="Table" class="table-image"/>
+        <mat-card-title>Table {{ table.number }}</mat-card-title>
+        <mat-checkbox [(ngModel)]="table.selected" (change)="onSelectionChange()"></mat-checkbox>
+      </div>
+    </div>
+  </div>
+
+  <!-- Next Button -->
+  <button class="start-button" mat-raised-button [disabled]="selectedCount === 0" (click)="navigateToNextPage()">
+    Next
+  </button>
+</div>

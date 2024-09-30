@@ -1,0 +1,15 @@
+
+.home-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Assure-toi que la carte a une hauteur définie */
+  width:400px;
+  height: 600px;
+}
+.container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
