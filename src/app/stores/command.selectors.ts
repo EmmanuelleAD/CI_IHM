@@ -1,8 +1,10 @@
 import {CommandState} from "./command.reducer";
 import {state} from "@angular/animations";
-import {createFeatureSelector, createSelector} from "@ngrx/store";
+import {createFeatureSelector, createSelector, on} from "@ngrx/store";
 import {OrderClient} from "../interfaces/OrderClient";
 import {getCurrentClient} from "./command.action";
+import * as CommandActions from "./command.action";
+import {Command} from "../interfaces/Command";
 export interface AppState {
   commandState: CommandState;
 }
@@ -32,3 +34,24 @@ export const selectCurrentClient=
       }
       return null;
     });
+export const selectIsTheFirstToCommand = (commandNumber: number, clientNumber: number)=>
+  createSelector(
+  selectCommands,
+  (commands) => {
+    console.log("teee")
+
+    const command = commands.find(command => command.commandId === commandNumber);
+    if (command) {
+      for (const table of command.tables) {
+        for (const client of table.clients) {
+          if (client.clientOrdered) {
+            console.log("teee")
+            return table.clients.indexOf(client) === clientNumber - 1;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+);

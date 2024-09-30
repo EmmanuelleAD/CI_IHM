@@ -161,17 +161,17 @@ export const commandReducer=createReducer(initialState,
 
     return state;
   }),
-  on(CommandActions.finishToCommandForClient,(state,{commandNumber, tableNumber, clientIndex})=>{
-    console.log("her",commandNumber, tableNumber, clientIndex)
+  on(CommandActions.finishToCommandForClient,(state,{commandNumber, tableNumber, clientNumber})=>{
+    console.log("her",commandNumber, tableNumber, clientNumber)
     const command=state.commands.find(cmd=>cmd.commandId===commandNumber);
     if(command){
 
     const table=  command.tables.find(table=>table.tableNumber===tableNumber);
     if(table){
-const client =table.clients.at(clientIndex-1);
+const client =table.clients.at(clientNumber-1);
       if(client){
         const updatedClients = table.clients.map((c, cIndex) =>
-          cIndex === clientIndex - 1 ? { ...c, clientOrdered: true } : c
+          cIndex === clientNumber - 1 ? { ...c, clientOrdered: true } : c
         );
         const allClientsOrdered = updatedClients.every(c => c.clientOrdered);
         console.log("cli",client)
@@ -200,13 +200,6 @@ const client =table.clients.at(clientIndex-1);
     console.log("comm",command)
 return state;
   }),
- /* on(CommandActions.isTheFirstToCommand,(state,{commandNumber,clientNumber})=>{
-    const command=state.commands.find(command=>command.commandId===commandNumber)
-    if(command){
-      const isTheFirst=command.tables.find()
-    }
-
-  })*/
 );
 
 export const commandsFeature = createFeature({

@@ -29,7 +29,7 @@
     <p>Total: {{ getTotal() }} €</p>
     <button (click)="validateCart(currentClient.commandNumber,currentClient.tableNumber,currentClient.clientNumber)">Validate Cart</button>
   </div>
-  <button *ngIf="currentClient.c">
+  <button *ngIf="!(isNotTheFirst$ | async) as isNotTheFirst">
     Copy the command
   </button>
 

@@ -5,12 +5,18 @@ import { CommonModule } from '@angular/common';
 import { MenuItem } from '../../interfaces/MenuItem';
 import {HeaderComponent} from "../header/header.component";
 import {Store} from "@ngrx/store";
-import {Observable} from "rxjs";
+import {Observable, of, switchMap} from "rxjs";
 import {OrderClient} from "../../interfaces/OrderClient";
-import {selectCurrentClient} from "../../stores/command.selectors";
-import {addItemForClient, finishToCommandForClient, removeItemForClient} from "../../stores/command.action";
+import {selectCurrentClient, selectIsTheFirstToCommand} from "../../stores/command.selectors";
+import {
+  addItemForClient,
+  finishToCommandForClient,
+  isTheFirstToCommand,
+  removeItemForClient
+} from "../../stores/command.action";
 import {Item} from "../../interfaces/Item";
 import {Router} from "@angular/router";
+import {filter, map} from "rxjs/operators";
 
 @Component({
   selector: 'app-menu',
@@ -23,7 +29,18 @@ export class MenuComponent implements OnInit{
   items: MenuItem[] = [];
   cart: MenuItem[] = [];
   private store=inject(Store);
-  currentClient$:Observable<OrderClient|null>=this.store.select(selectCurrentClient);
+  currentClient$:Observable<OrderClient|null>=this.store.select(selectCurrentClient).pipe( );
+  isNotTheFirst$?: Observable<boolean>=
+  this.currentClient$.pipe(
+    filter((client: OrderClient | null) => !!client),
+  map((client: OrderClient | null) => {
+  if (client) {
+    return this.store.select(selectIsTheFirstToCommand(client.commandNumber, client.clientNumber));
+  }
+  return of(false);
+}),
+switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
+);
   constructor(  public menuServiceService: MenuServiceService,  private router: Router) {}
 
   ngOnInit() {
@@ -137,6 +154,10 @@ export class MenuComponent implements OnInit{
   onCartClick(): void {
     console.log('Cart clicked!');
 
+  }
+  isTheFirstToOrder(commandNumber:number,clientNumber:number):Observable<boolean>{
+    console.log("in the first order")
+    return this.store.select(selectIsTheFirstToCommand(commandNumber, clientNumber));
   }
 
 }
