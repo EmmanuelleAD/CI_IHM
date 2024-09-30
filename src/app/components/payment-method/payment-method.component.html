@@ -1,0 +1,65 @@
+<div *ngIf="tables.length" class="container my-4">
+  
+  <h1 class="mb-4 text-center">Command Number: {{ commandId }}</h1>
+
+  <h3 class="mb-3 text-center">Select Tables To Pay:</h3>
+
+  <!-- Alert Box -->
+  <div *ngIf="showAlert" class="alert alert-warning alert-dismissible fade show" role="alert">
+    {{ alertMessage }}
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeAlert()"></button>
+  </div>
+
+  <!-- Tables Section -->
+  <div class="table-buttons-container card shadow-sm p-4">
+    <div class="row justify-content-center">
+      <div *ngFor="let table of tables" class="col-6 col-md-4 col-lg-3 mb-3 d-flex justify-content-center">
+        <app-table
+          [number]="table.tableNumber"
+          [disabled]="table.tablePaid"
+          (click)="selectTable(table, table.tablePaid)">
+        </app-table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selected Table Section -->
+  <div *ngIf="selectedTable" class="mt-4 card shadow-sm p-4">
+    <h4 class="mb-3">Selected Table: {{ selectedTable }}</h4>
+    <label class="mb-2">Would you like to pay for:</label>
+    <div>
+      <button class="btn btn-primary me-2" (click)="processPayment()">Whole Table</button>
+      <button class="btn btn-secondary" (click)="choosePaymentMethod('individual')">Each Client</button>
+    </div>
+  </div>
+
+  <!-- Whole Table Payment Section -->
+  <div *ngIf="payAll" class="mt-4 card shadow-sm p-4">
+    <h4 class="mb-3">Bill for the selected Tables: {{ tablesTotal | currency }}</h4>
+    <div class="accordion" id="accordionExample">
+      <div *ngFor="let bill of payTablesBill; let i = index" class="accordion-item">
+        <h2 class="accordion-header" [id]="'heading' + i">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                  [attr.data-bs-target]="'#collapse' + i" aria-expanded="false" 
+                  [attr.aria-controls]="'collapse' + i">
+            Table {{ bill.tableNumber }} Total: {{ bill.tableTotal | currency }}
+          </button>
+        </h2>
+        <div [id]="'collapse' + i" class="accordion-collapse collapse" 
+             [attr.aria-labelledby]="'heading' + i" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let client of bill.clients">
+                Client {{ client.clientNumber }} Total: {{ client.price | currency }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <button class="btn btn-success" (click)="processPayment()">Pay Now</button>
+  </div>
+
+
+</div>

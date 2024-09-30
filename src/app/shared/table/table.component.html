@@ -1,0 +1,15 @@
+
+<button 
+  class="btn rounded-0" 
+  [ngClass]="{
+    'btn-secondary': disabled, 
+    'btn-success': !disabled && !isSelected(number),
+    'btn-primary': !disabled && isSelected(number)
+  }"
+  [attr.disabled]="disabled ? true : null" 
+  (click)="toggleTableSelection(number)"
+  [style.width.px]="100" 
+  [style.height.px]="50"
+  [style.fontSize.px]="20">
+  {{ number }}
+</button>
