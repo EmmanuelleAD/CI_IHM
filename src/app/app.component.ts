@@ -1,8 +1,10 @@
 
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { TestService } from '@services/test.service';
+
 import {  NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {TestService} from "./services/wf_services/test.service";
+
 @Component({
   selector: 'app-root',
   standalone: true,

@@ -1,10 +1,20 @@
 
-<h4 class="title-center"> Table{{tableNumber}}</h4>
-<h4 class="title-center">P{{personNumber}}</h4>
-<div class="categories">
-  <app-category *ngFor="let  category of categories" [title]="category.title" [imageLink]="category.path" class="category">
+<div *ngIf="currentClient$|async as currentClient; else noClient">
+  <h4 class="title-center"> Table{{currentClient.tableNumber}}</h4>
+  <h4 class="title-center">P{{currentClient.clientNumber}}</h4>
+  <div class="categories">
+    <app-category *ngFor="let  category of categories" [title]="category.title" [imageLink]="category.path" class="category"  routerLink="/menu">
 
-  </app-category>
+    </app-category>
+  </div>
 </div>
 
 
+<!-- Ajouter cette section pour afficher le contenu de currentClient$ -->
+<ng-container *ngIf="currentClient$ | async as currentClient">
+  <pre>{{ currentClient | json }}</pre>
+</ng-container>
+
+<ng-template #noClient>
+  <p>Aucun client trouvé.</p>
+</ng-template>

@@ -1,24 +1,60 @@
-import { Component, OnInit  } from '@angular/core';
-import { MenuItemComponent } from '../../../../src/app/components/menu-item/menu-item.component';
+import {Component, inject, OnInit} from '@angular/core';
+import { MenuItemComponent } from '../menu-item/menu-item.component';
 import { MenuServiceService } from '../../services/menu-service.service';
 import { CommonModule } from '@angular/common';
 import { MenuItem } from '../../interfaces/MenuItem';
+import {HeaderComponent} from "../header/header.component";
+import {Store} from "@ngrx/store";
+import {Observable, of, switchMap} from "rxjs";
+import {OrderClient} from "../../interfaces/OrderClient";
+import {selectCurrentClient, selectIsTheFirstToCommand} from "../../stores/command.selectors";
+import {
+  addItemForClient,
+  finishToCommandForClient,
+  isTheFirstToCommand,
+  removeItemForClient
+} from "../../stores/command.action";
+import {Item} from "../../interfaces/Item";
+import {Router} from "@angular/router";
+import {filter, map} from "rxjs/operators";
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule,MenuItemComponent],
+  imports: [CommonModule, MenuItemComponent, HeaderComponent],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
 export class MenuComponent implements OnInit{
   items: MenuItem[] = [];
   cart: MenuItem[] = [];
-
-  constructor(  public menuServiceService: MenuServiceService) {}
+  private store=inject(Store);
+  currentClient$:Observable<OrderClient|null>=this.store.select(selectCurrentClient).pipe( );
+  isNotTheFirst$?: Observable<boolean>=
+  this.currentClient$.pipe(
+    filter((client: OrderClient | null) => !!client),
+  map((client: OrderClient | null) => {
+  if (client) {
+    return this.store.select(selectIsTheFirstToCommand(client.commandNumber, client.clientNumber));
+  }
+  return of(false);
+}),
+switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
+);
+  constructor(  public menuServiceService: MenuServiceService,  private router: Router) {}
 
   ngOnInit() {
-    this.displayAllItems();
+  this.menuServiceService.items$.subscribe(
+    (data: any) => {
+      this.items = data.map((item: MenuItem) => {
+        const cartItem = this.cart.find(i => i._id === item._id);
+        return {
+          ...item,
+          quantity: cartItem ? cartItem.quantity : 0  // Charger la quantité sauvegardée ou initialiser à 0
+        };
+      });
+    }
+  )
     this.loadCart();
   }
 
@@ -42,18 +78,24 @@ export class MenuComponent implements OnInit{
   }
 
 
-  increaseQuantity(item: any) {
-    item.quantity += 1;
-    this.updateCart(item)
+  increaseQuantity(commandNumber: number, tableNumber: number, clientIndex: number, itemToIncrease: MenuItem) {
+    itemToIncrease.quantity += 1;
+    this.updateCart(itemToIncrease)
+    const item:Item={itemId:itemToIncrease._id,quantity:itemToIncrease.quantity,price:itemToIncrease.price}
+    this.store.dispatch(addItemForClient({ commandNumber, tableNumber, clientIndex,item:item  }));
   }
-
   // Méthode pour diminuer la quantité
-  decreaseQuantity(item: any) {
-    if (item.quantity > 0) {
-      item.quantity -= 1;
-      this.updateCart(item)
+  decreaseQuantity(commandNumber: number, tableNumber: number, clientIndex: number, itemToRemove: MenuItem) {
+    if (itemToRemove.quantity > 0) {
+      itemToRemove.quantity -= 1;
+      this.updateCart(itemToRemove) ;
+      const item:Item={itemId:itemToRemove._id,quantity:itemToRemove.quantity,price:itemToRemove.price}
+      this.store.dispatch(removeItemForClient({ commandNumber, tableNumber, clientIndex,itemToRemove:item  }));
     }
   }
+
+
+
 
   handleQuantityChange(event: { itemId: string, quantity: number }) {
     const item = this.items.find(i => i._id === event.itemId);
@@ -92,10 +134,12 @@ export class MenuComponent implements OnInit{
     this.updateLocalStorage();
   }
 
-  validateCart() {
+  validateCart(commandNumber:number, tableNumber:number, clientIndex:number) {
     console.log('Cart validated', this.cart);
     this.cart = [];
     localStorage.removeItem('cart');
+    this.store.dispatch(finishToCommandForClient({ commandNumber, tableNumber, clientNumber: clientIndex  }));
+    this.router.navigate(['/table-categories']);
   }
 
   getTotal(): number {
@@ -110,6 +154,10 @@ export class MenuComponent implements OnInit{
   onCartClick(): void {
     console.log('Cart clicked!');
 
+  }
+  isTheFirstToOrder(commandNumber:number,clientNumber:number):Observable<boolean>{
+    console.log("in the first order")
+    return this.store.select(selectIsTheFirstToCommand(commandNumber, clientNumber));
   }
 
 }
