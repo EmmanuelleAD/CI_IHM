@@ -51,13 +51,14 @@ export class TableReservationComponent {
   ngOnInit(): void {
     this.http.get<Table[]>(this.backendUrl).subscribe({
       next: (response: Table[]) => {
-
-        this.tables = response.map((table, index) => ({
-          ...table,
-          positionX: (index % 5) * 120,  // Horizontal position (adjust spacing)
-          positionY: Math.floor(index / 5) * 120  // Vertical position (adjust spacing)
-        }));
-        console.log('Fetched tables from backend:', this.tables);
+        this.tables = response
+          .filter(table => table.number < 100)
+          .map((table, index) => ({
+            ...table,
+            positionX: (index % 5) * 120,
+            positionY: Math.floor(index / 5) * 120
+          }));
+        console.log('Fetched tables from backend (filtered):', this.tables);
       },
       error: (error: any) => {
         console.error("Error fetching tables from backend:", error);
@@ -68,11 +69,10 @@ export class TableReservationComponent {
     const tableNumberGlobal = this.route.snapshot.paramMap.get('tableNumberGlobal');
 
     this.numberOfCustomers = count ? Number(count) : 0;
-
     this.tableNumberGlobal = tableNumberGlobal ? Number(tableNumberGlobal) : 0;
-
     this.numberOfTables = Math.ceil(this.numberOfCustomers / 4);
   }
+
 
   onSelectionChange() {
     this.selectedCount = this.tables.filter(table => table.selected).length;
