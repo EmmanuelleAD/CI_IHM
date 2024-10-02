@@ -1,0 +1,28 @@
+.client{
+  width: 45%;
+  height:10em;
+  text-align: center;
+  justify-content: center;
+}
+.tableCommand{
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 2em;
+}
+.copyButton{
+  background-color:#47cd6d;
+  color:white;
+  margin-right: 1em;
+}
+.cancelButton{
+  background-color: #e65a34;
+  color: white;
+
+}
+.description{
+  margin: 2em;
+  height: 100%;
+}
+.buttonGroup{
+  margin-top: 2em;
+}

@@ -1,4 +1,4 @@
-<div *ngIf="currentClient$|async as currentClient">
+<div *ngIf="currentClient$|async as currentClient else commandFinished">
   <app-header></app-header>
   <!-- Boutons pour filtrer les items par catégorie -->
   <div class="filter-buttons">
@@ -29,8 +29,23 @@
     <p>Total: {{ getTotal() }} €</p>
     <button (click)="validateCart(currentClient.commandNumber,currentClient.tableNumber,currentClient.clientNumber)">Validate Cart</button>
   </div>
-  <button *ngIf="!(isNotTheFirst$ | async) as isNotTheFirst">
-    Copy the command
+  <button mat-flat-button *ngIf="!(isTheFirst$ | async) " class="copyButton" (click)="openCopyModal(currentClient)" >
+    Copy the order
   </button>
 
 </div>
+
+
+
+<ng-template #commandFinished>
+  <div class="finishOrder">
+    <mat-card class="finishContent">
+      <mat-card-content >
+        <h3>Order validated</h3>
+       <h3>Order Number:</h3>
+        <h2>{{commandNumber}}</h2>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</ng-template>

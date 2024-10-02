@@ -2,7 +2,8 @@ import {Command} from "../interfaces/Command";
 import {createFeature, createReducer, on} from "@ngrx/store";
 import * as CommandActions from './command.action'
 import {OrderClient} from "../interfaces/OrderClient";
-import {finishToCommandForClient} from "./command.action";
+import {finishToCommandForClient, getCurrentClient} from "./command.action";
+import {state} from "@angular/animations";
 export interface CommandState {
   commands:Command[];
   currentClient:OrderClient|null;
@@ -29,6 +30,21 @@ const initialState:CommandState={
           },
           {
             client: "2",
+            clientPaid: false,
+            clientOrdered:false,
+            items: [
+
+            ]
+          },
+          {
+            client: "3",
+            clientPaid: false,
+            clientOrdered:false,
+            items: [
+
+            ]
+          }, {
+            client: "4",
             clientPaid: false,
             clientOrdered:false,
             items: [
@@ -81,7 +97,7 @@ export const commandReducer=createReducer(initialState,
                 : it
             )
             : [...client.items,item];
-
+console.log("yes",updatedItems)
             return {
               ...state,
               commands: state.commands.map(cmd =>
@@ -93,7 +109,7 @@ export const commandReducer=createReducer(initialState,
                         ? {
                           ...t,
                           clients: t.clients.map((c, cIndex) =>
-                            cIndex === clientIndex
+                            cIndex === clientIndex-1
                               ? {...c, items: updatedItems} // Ajouter l'item au client
                               : c
                           ),
@@ -140,7 +156,7 @@ export const commandReducer=createReducer(initialState,
                         ? {
                           ...t,
                           clients: t.clients.map((c, cIndex) =>
-                            cIndex === clientIndex
+                            cIndex === clientIndex-1
                               ? {...c, items: updatedItems} // Ajouter l'item au client
                               : c
                           ),
@@ -200,6 +216,33 @@ const client =table.clients.at(clientNumber-1);
     console.log("comm",command)
 return state;
   }),
+  on(CommandActions.copyCommandForCurrentClient,(state,{otherClientIndex})=>{
+    const command= state.commands[0]
+    if(command){
+      const table=command.tables.find(t=>!t.tableOrdered);
+      if(table){
+        const client= table.clients.find(c=>!c.clientOrdered)
+        const otherClient=table.clients.at(otherClientIndex)
+        if(client&&otherClient){
+          const itemsForCurrent=otherClient.items
+          const tableOrdered=client===table.clients.at(table.clients.length-1)
+        const updatedClients=table.clients.map(c=>c===client?{...c,items:[...itemsForCurrent],clientOrdered:true,tableOrdered:tableOrdered}:c);
+          const updatedTables=command.tables.map(t=>t==table?{...t,clients:updatedClients,}:t);
+          return{
+            ...state,
+            commands:[
+              {
+                ...command,
+                tables: updatedTables
+              }
+            ]
+          }
+        }
+        }
+      }
+    return state;
+
+  })
 );
 
 export const commandsFeature = createFeature({

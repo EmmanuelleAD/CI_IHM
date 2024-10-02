@@ -10,6 +10,7 @@ export const addItemForClient=createAction(
   props<{commandNumber:number;tableNumber:number;clientIndex:number;item:Item}>()
 
 );
+export const copyCommandForCurrentClient=createAction('[Command] Copy command for current client',props<{otherClientIndex:number}>());
 export const removeItemForClient=createAction(
   '[Command] Remove item for client',
   props<{commandNumber:number;tableNumber:number;clientIndex:number;itemToRemove:Item}>()

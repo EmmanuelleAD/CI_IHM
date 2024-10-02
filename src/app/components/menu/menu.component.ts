@@ -17,11 +17,15 @@ import {
 import {Item} from "../../interfaces/Item";
 import {Router} from "@angular/router";
 import {filter, map} from "rxjs/operators";
+import {MatDialog, MatDialogModule} from "@angular/material/dialog";
+import {CommandDescriptionComponent} from "../command-description/command-description.component";
+import {MatButton} from "@angular/material/button";
+import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, MenuItemComponent, HeaderComponent],
+  imports: [CommonModule, MenuItemComponent, HeaderComponent, MatDialogModule, MatButton, MatCard, MatCardHeader, MatCardContent, MatCardSubtitle, MatCardTitle],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
@@ -29,19 +33,21 @@ export class MenuComponent implements OnInit{
   items: MenuItem[] = [];
   cart: MenuItem[] = [];
   private store=inject(Store);
+  commandNumber:number=-1;
   currentClient$:Observable<OrderClient|null>=this.store.select(selectCurrentClient).pipe( );
-  isNotTheFirst$?: Observable<boolean>=
+  isTheFirst$?: Observable<boolean>=
   this.currentClient$.pipe(
     filter((client: OrderClient | null) => !!client),
   map((client: OrderClient | null) => {
   if (client) {
+    this.commandNumber=client.commandNumber
     return this.store.select(selectIsTheFirstToCommand(client.commandNumber, client.clientNumber));
   }
-  return of(false);
+  return of(true);
 }),
 switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
 );
-  constructor(  public menuServiceService: MenuServiceService,  private router: Router) {}
+  constructor(  public menuServiceService: MenuServiceService,  private router: Router,public dialog: MatDialog) {}
 
   ngOnInit() {
   this.menuServiceService.items$.subscribe(
@@ -59,7 +65,6 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
   }
 
   displayAllItems(){
-    //console.log('displayAllItems');
     this.menuServiceService.getAllItems().subscribe((data: any) => {
       this.items = data.map((item: MenuItem) => {
         const cartItem = this.cart.find(i => i._id === item._id);
@@ -81,7 +86,7 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
   increaseQuantity(commandNumber: number, tableNumber: number, clientIndex: number, itemToIncrease: MenuItem) {
     itemToIncrease.quantity += 1;
     this.updateCart(itemToIncrease)
-    const item:Item={itemId:itemToIncrease._id,quantity:itemToIncrease.quantity,price:itemToIncrease.price}
+    const item:Item={itemId:itemToIncrease._id,quantity:itemToIncrease.quantity,price:itemToIncrease.price,title:itemToIncrease.fullName}
     this.store.dispatch(addItemForClient({ commandNumber, tableNumber, clientIndex,item:item  }));
   }
   // Méthode pour diminuer la quantité
@@ -89,7 +94,7 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
     if (itemToRemove.quantity > 0) {
       itemToRemove.quantity -= 1;
       this.updateCart(itemToRemove) ;
-      const item:Item={itemId:itemToRemove._id,quantity:itemToRemove.quantity,price:itemToRemove.price}
+      const item:Item={itemId:itemToRemove._id,quantity:itemToRemove.quantity,price:itemToRemove.price,title:itemToRemove.fullName}
       this.store.dispatch(removeItemForClient({ commandNumber, tableNumber, clientIndex,itemToRemove:item  }));
     }
   }
@@ -160,4 +165,8 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
     return this.store.select(selectIsTheFirstToCommand(commandNumber, clientNumber));
   }
 
+  openCopyModal(orderClient:OrderClient) {
+  this.dialog.open(CommandDescriptionComponent, {data: {orderClient: orderClient}, width: '80%',
+    height: '80%'});
+  }
 }
