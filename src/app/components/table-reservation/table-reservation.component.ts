@@ -9,7 +9,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import {TableService} from "../table.service";
 import {toObservable} from "@angular/core/rxjs-interop";
-import {OrderManager} from "../OrderManager";
+import {OrderManagerCopyService} from "../order-manager-copy.service";
 
 interface Table {
   _id: string;
@@ -58,7 +58,7 @@ export class TableReservationComponent {
   selectedCount: number = 0;
   tableNumberGlobal: number = 0;  // Variable to store the global table number
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router,private  serviceTable:TableService,private  orderManager:OrderManager) { }
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router,private  serviceTable:TableService,private  orderManager:OrderManagerCopyService) { }
 
   ngOnInit(): void {
     this.http.get<Table[]>(this.backendUrl).subscribe({

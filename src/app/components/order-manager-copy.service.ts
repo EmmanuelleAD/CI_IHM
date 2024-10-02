@@ -1,4 +1,6 @@
-import { OrderService } from "./orderService";
+import { Injectable } from '@angular/core';
+import {OrderService} from "./orderService";
+
 
 interface OrderDictionary {
   [commandId: string]: {
@@ -10,8 +12,11 @@ interface OrderDictionary {
     }[];
   };
 }
+@Injectable({
+  providedIn: 'root'
+})
+export class OrderManagerCopyService {
 
-export class OrderManager {
   constructor(private orderService: OrderService) {}
 
   generateOrderJSON(ordersMap: OrderDictionary): Promise<any[]> {
