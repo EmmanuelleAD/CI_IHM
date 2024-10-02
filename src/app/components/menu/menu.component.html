@@ -1,10 +1,10 @@
 <div *ngIf="currentClient$|async as currentClient else commandFinished">
   <app-header></app-header>
-  <!-- Boutons pour filtrer les items par catégorie -->
   <div class="filter-buttons">
     <button (click)="displayAllItems()">All</button>
   </div>
-
+  <h4 class="title-center"> Table{{currentClient.tableNumber}}</h4>
+  <h4 class="title-center">P{{currentClient.clientNumber}}</h4>
 
   <div class="menu-container">
     <div *ngFor="let item of items" class="menu-item">

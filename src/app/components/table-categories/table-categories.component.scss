@@ -1,23 +1,4 @@
-/*.categories {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); !* Deux colonnes de largeur égale *!
-  gap: 20px; !* Espace entre les éléments *!
-  margin: 0 20px; !* Marge autour du conteneur *!
-}
 
-.category {
-  display: flex;
-  justify-content: center; !* Centre le contenu de chaque catégorie *!
-  align-items: center; !* Aligne verticalement au centre *!
-
-}
-
-.category:nth-child(3) {
-  grid-column: 1 / -1; !* Le troisième élément prend toute la largeur *!
-  display: flex;
-  justify-content: center; !* Centre le contenu *!
-
-}*/
 .categories {
   display: grid;
   grid-template-rows: [row1-start] 50%  [row1-end] 50%;
