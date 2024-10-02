@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import {TableService} from "../table.service";
 import {toObservable} from "@angular/core/rxjs-interop";
+import {OrderManager} from "../OrderManager";
 
 interface Table {
   _id: string;
@@ -19,6 +20,17 @@ interface Table {
   positionY: number;
   selected?: boolean;
 }
+interface OrderDictionary {
+  [commandId: string]: {
+    tableId: string;      // L'ID de la table (dans la base de données)
+    tableNumber: number;  // Le vrai numéro de la table (YYY)
+    clients: {            // Liste des clients associés à cette table
+      clientId: string;   // Le numéro du client (ZZZ)
+      orderId: string;    // L'ID de la commande (récupéré depuis la réponse backend)
+    }[];
+  };
+}
+
 
 @Component({
   selector: 'app-table-reservation',
@@ -46,7 +58,7 @@ export class TableReservationComponent {
   selectedCount: number = 0;
   tableNumberGlobal: number = 0;  // Variable to store the global table number
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router,private  serviceTable:TableService) { }
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router,private  serviceTable:TableService,private  orderManager:OrderManager) { }
 
   ngOnInit(): void {
     this.http.get<Table[]>(this.backendUrl).subscribe({
@@ -86,16 +98,15 @@ export class TableReservationComponent {
     let currentClientNumber = 1;
 
     for (let client = 1; client <= totalClients; client++) {
-      // Numéro global (par exemple 494)
+
       const globalPart = globalOrderNumber.toString().padStart(3, '0');
 
-      // Numéro de la table (par exemple 002)
+
       const tableNumber = tables[currentTableIndex].number.toString().padStart(3, '0');
 
-      // Numéro du client (par exemple 001)
       const clientNumber = (currentClientNumber).toString().padStart(3, '0');
 
-      // Génère le numéro complet pour le client : "494002001"
+
       const tableClientNumber = `${globalPart}${tableNumber}${clientNumber}`;
       console.log(tableClientNumber);
       result.push(tableClientNumber);
@@ -112,51 +123,52 @@ export class TableReservationComponent {
     return result;
   }
   validerRepartition() {
-    const tablesSelectionnees = this.tables.filter(table => table.selected); // Tables sélectionnées
+    const tablesSelectionnees = this.tables.filter(table => table.selected);  // Tables sélectionnées
     console.log("Table Number Global:", this.tableNumberGlobal);
-    // Obtenir les numéros complexes pour chaque client
+
+
     const clientsRepartis = this.repartirClientsSurTables(this.numberOfCustomers, this.tableNumberGlobal, tablesSelectionnees, 4);
 
-    let ordersMap: { [tableNumber: string]: { [client: string]: string }[] } = {}; // Dictionnaire pour stocker les commandes par client pour chaque table
+    let ordersMap: OrderDictionary = {};
 
-    let clientIndex = 0; // Index pour parcourir clientsRepartis
+    let clientIndex = 0;
 
     tablesSelectionnees.forEach((table) => {
-      ordersMap[table.number] = [];
-      console.log(table.number);
+      const commandId = this.tableNumberGlobal.toString().padStart(3, '0');
+      const tableNumber = table.number;
+      const tableId = table._id;
+      if (!ordersMap[commandId]) {
+        ordersMap[commandId] = {
+          tableId: tableId,
+          tableNumber: tableNumber,
+          clients: []
+        };
+      }
 
 
-      this.serviceTable.createTableOrder(table.number, 1).subscribe({
-        next: (response) => {
-          console.log(`Table ${table.number} réservée avec succès. Réponse:`, response);
+      for (let client = 1; client <= 4 && clientIndex < clientsRepartis.length; client++) {
+        const complexTableNumber = parseInt(clientsRepartis[clientIndex], 10);
+        const clientId = complexTableNumber.toString().slice(-3);
+        clientIndex++;
+        console.log(`Numéro complexe pour le client ${client}: ${complexTableNumber}`);
 
-          // 2. Après avoir réservé la table, créer un ordre pour chaque client avec un numéro complexe provenant de clientsRepartis
-          for (let client = 1; client <= 4 && clientIndex < clientsRepartis.length; client++) {
-            const complexTableNumber = parseInt(clientsRepartis[clientIndex], 10); // Convertir en nombre
-            clientIndex++; // Incrémenter l'index du client
+        this.serviceTable.createTableOrder(complexTableNumber, 1).subscribe({
+          next: (clientResponse) => {
+            console.log(`Commande créée avec succès pour le client ${client} à la table ${tableNumber}. Réponse:`, clientResponse);
 
-            console.log(`Numéro complexe pour le client ${client}: ${complexTableNumber}`);
 
-            // Créer la commande pour chaque client avec le numéro complexe
-            this.serviceTable.createTable(complexTableNumber).subscribe(()=>            this.serviceTable.createTableOrder(complexTableNumber, 1).subscribe({
-              next: (clientResponse) => {
-                console.log(`Commande créée avec succès pour le client ${client} à la table ${table.number}. Réponse:`, clientResponse);
-
-                // Stocker l'ID de la commande dans le dictionnaire pour cette table, avec le numéro de client
-                ordersMap[table.number].push({ [`client${client}`]: clientResponse._id });
-              },
-              error: (error) => {
-                console.error(`Erreur lors de la création de la commande pour le client ${client} à la table ${table.number}:`, error);
-              }
-            })
-          )
+            ordersMap[commandId].clients.push({
+              clientId: clientId,
+              orderId: clientResponse._id
+            });
+          },
+          error: (error) => {
+            console.error(`Erreur lors de la création de la commande pour le client ${client} à la table ${tableNumber}:`, error);
           }
-        },
-        error: (error) => {
-          console.error(`Erreur lors de la réservation de la table ${table.number}:`, error);
-        }
-      });
+        });
+      }
     });
+    this.orderManager.generateOrderJSON(ordersMap);
 
     console.log("Répartition des clients avec ID de commande :", ordersMap);
   }
@@ -164,9 +176,9 @@ export class TableReservationComponent {
 
 
 
-
   navigateToNextPage() {
     this.validerRepartition();
+
     this.router.navigate(['/menu']);
   }
 }
