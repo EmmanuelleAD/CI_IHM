@@ -17,7 +17,7 @@ export const routes: Routes = [
   { path: 'category', component: CategoryComponent },
   { path: 'table-categories', component: TableCategoriesComponent },
   { path: 'header', component: HeaderComponent },
-  { path: 'table-reservation/:count', component: TableReservationComponent },
+  { path: 'table-reservation/:count/:tableNumberGlobal', component: TableReservationComponent },
   { path: 'customer-count', component: CustomerCountComponent },
   { path: 'payment-review/:orderId/:tableNumber', component: PaymentReviewComponent }
 
