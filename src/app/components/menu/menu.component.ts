@@ -11,7 +11,6 @@ import {selectCurrentClient, selectIsTheFirstToCommand} from "../../stores/comma
 import {
   addItemForClient,
   finishToCommandForClient,
-  isTheFirstToCommand,
   removeItemForClient
 } from "../../stores/command.action";
 import {Item} from "../../interfaces/Item";
@@ -83,19 +82,19 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
   }
 
 
-  increaseQuantity(commandNumber: number, tableNumber: number, clientIndex: number, itemToIncrease: MenuItem) {
+  increaseQuantity( tableNumber: number, clientIndex: number, itemToIncrease: MenuItem) {
     itemToIncrease.quantity += 1;
     this.updateCart(itemToIncrease)
     const item:Item={itemId:itemToIncrease._id,quantity:itemToIncrease.quantity,price:itemToIncrease.price,title:itemToIncrease.fullName}
-    this.store.dispatch(addItemForClient({ commandNumber, tableNumber, clientIndex,item:item  }));
+    this.store.dispatch(addItemForClient({  tableNumber, clientIndex,item:item  }));
   }
   // Méthode pour diminuer la quantité
-  decreaseQuantity(commandNumber: number, tableNumber: number, clientIndex: number, itemToRemove: MenuItem) {
+  decreaseQuantity( tableNumber: number, clientIndex: number, itemToRemove: MenuItem) {
     if (itemToRemove.quantity > 0) {
       itemToRemove.quantity -= 1;
       this.updateCart(itemToRemove) ;
       const item:Item={itemId:itemToRemove._id,quantity:itemToRemove.quantity,price:itemToRemove.price,title:itemToRemove.fullName}
-      this.store.dispatch(removeItemForClient({ commandNumber, tableNumber, clientIndex,itemToRemove:item  }));
+      this.store.dispatch(removeItemForClient({  tableNumber, clientIndex,itemToRemove:item  }));
     }
   }
 
@@ -139,11 +138,11 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
     this.updateLocalStorage();
   }
 
-  validateCart(commandNumber:number, tableNumber:number, clientIndex:number) {
+  validateCart(tableNumber:number, clientIndex:number) {
     console.log('Cart validated', this.cart);
     this.cart = [];
     localStorage.removeItem('cart');
-    this.store.dispatch(finishToCommandForClient({ commandNumber, tableNumber, clientNumber: clientIndex  }));
+    this.store.dispatch(finishToCommandForClient({  tableNumber, clientNumber: clientIndex  }));
     this.router.navigate(['/table-categories']);
   }
 
@@ -160,10 +159,7 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
     console.log('Cart clicked!');
 
   }
-  isTheFirstToOrder(commandNumber:number,clientNumber:number):Observable<boolean>{
-    console.log("in the first order")
-    return this.store.select(selectIsTheFirstToCommand(commandNumber, clientNumber));
-  }
+
 
   openCopyModal(orderClient:OrderClient) {
   this.dialog.open(CommandDescriptionComponent, {data: {orderClient: orderClient}, width: '80%',
