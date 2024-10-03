@@ -10,7 +10,7 @@
         <button *ngFor="let client of selectedTable?.clients"
                 (click)="toggleClientSelection(client)"
                 [ngClass]="getClientButtonClass(client)">
-            Client {{ client.client }}
+            Client {{ client.clientId}}
         </button>
     </div>
 
