@@ -52,7 +52,8 @@ currentTable:Table|null=null;
   getCurrentClient():OrderClient{
     return {
       tableNumber:this.currentCommand.tables[this.currentTableIndex].tableNumber,
-      clientNumber:this.currentClientIndex+1
+      clientNumber:this.currentClientIndex+1,
+      commandNumber:this.currentCommand.commandId
     }
   }
   addItemForCurrentClient(){

@@ -6,6 +6,7 @@ import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { MenuServiceService } from './services/menu-service.service';
 import { AppRoutingModule } from './app.routes';
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 
 
@@ -17,7 +18,8 @@ import { AppRoutingModule } from './app.routes';
     BrowserModule,
     NgbModule,
     NgbDatepickerModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule
   ],
   providers: [MenuServiceService],
   bootstrap: []

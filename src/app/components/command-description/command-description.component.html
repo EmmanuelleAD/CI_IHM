@@ -1,0 +1,31 @@
+<div class="description">
+  <div *ngIf="!isDetailsDisplayed">
+    <div *ngIf="currentTable$ | async as currentTable; " >
+      <div *ngFor="let client of currentTable.clients;let i = index;" class="tableCommand">
+        <mat-card  class="client" *ngIf="client.clientOrdered" (click)="openDetails(client.items,i)">
+          <mat-card-content >Customer {{i+1}}</mat-card-content>
+
+        </mat-card>
+      </div>
+
+    </div>
+  </div>
+
+  <div  *ngIf="isDetailsDisplayed" >
+    <mat-card >
+      <mat-card-header>
+        <mat-card-title>Customer {{copyIndex+1}}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content *ngFor="let item of itemsToDisplay">
+        {{ item.title }} x {{item.quantity}}
+
+      </mat-card-content>
+      <mat-card-actions >
+      <button mat-flat-button (click)="copyTheCommand()" class="copyButton" >Copy </button>
+      <button mat-flat-button class="cancelButton" (click)="cancel()">Cancel</button>
+    </mat-card-actions>
+    </mat-card>
+  </div>
+
+
+</div>

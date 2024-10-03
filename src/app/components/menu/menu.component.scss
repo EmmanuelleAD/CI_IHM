@@ -26,3 +26,20 @@
     margin: 0 10px;
     cursor: pointer;
   }
+  .copyButton{
+    background-color: #0c1f27 !important;;
+    color: white !important;;
+  }
+  .finishOrder{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+  }
+  .finishContent{
+    padding: 3em;
+    text-align: center;
+  }
+.title-center{
+  text-align: center;
+}

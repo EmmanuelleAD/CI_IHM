@@ -12,6 +12,19 @@ export const selectCommandState = createFeatureSelector<CommandState>('commands'
 
 export const selectCommands = createSelector(selectCommandState,
   (state:CommandState)=>state.commands)
+export const selectTable=(commandNumber: number,tableNumber:number)=>createSelector(selectCommands,
+  (commands)=>{
+  console.log(commandNumber,tableNumber)
+    console.log(commands)
+const command= commands.find(com=>com.commandId===commandNumber);
+if(command){
+  console.log( command.tables.find(table=>table.tableNumber===tableNumber))
+  return command.tables.find(table=>table.tableNumber===tableNumber)
+
+}
+    return null
+
+  })
 export const selectCurrentClient=
   createSelector(selectCommands,
     (commands) => { console.log("com",commands)
@@ -22,7 +35,6 @@ export const selectCurrentClient=
         if (table) {
           const client = table.clients.find(c => !c.clientOrdered);
           if (client) {
-            // Renvoie du client avec les infos nécessaires
             const currentClient: OrderClient = {
               clientNumber: table.clients.indexOf(client) + 1,
               tableNumber: table.tableNumber,
@@ -38,20 +50,21 @@ export const selectIsTheFirstToCommand = (commandNumber: number, clientNumber: n
   createSelector(
   selectCommands,
   (commands) => {
-    console.log("teee")
-
     const command = commands.find(command => command.commandId === commandNumber);
     if (command) {
       for (const table of command.tables) {
         for (const client of table.clients) {
-          if (client.clientOrdered) {
-            console.log("teee")
-            return table.clients.indexOf(client) === clientNumber - 1;
+          if (table.clients.indexOf(client) === clientNumber - 1) {
+            return true;
+
+          }
+         else if(client.clientOrdered) {
+            return false
           }
         }
       }
     }
 
-    return false;
+    return true;
   }
 );

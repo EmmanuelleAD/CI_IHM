@@ -2,7 +2,8 @@ import {Command} from "../interfaces/Command";
 import {createFeature, createReducer, on} from "@ngrx/store";
 import * as CommandActions from './command.action'
 import {OrderClient} from "../interfaces/OrderClient";
-import {finishToCommandForClient} from "./command.action";
+import {finishToCommandForClient, getCurrentClient} from "./command.action";
+import {state} from "@angular/animations";
 export interface CommandState {
   commands:Command[];
   currentClient:OrderClient|null;
@@ -34,6 +35,21 @@ const initialState:CommandState={
             items: [
 
             ]
+          },
+          {
+            client: "3",
+            clientPaid: false,
+            clientOrdered:false,
+            items: [
+
+            ]
+          }, {
+            client: "4",
+            clientPaid: false,
+            clientOrdered:false,
+            items: [
+
+            ]
           }]
 
       }
@@ -42,8 +58,8 @@ const initialState:CommandState={
   currentClient:null
 }
 export const commandReducer=createReducer(initialState,
-  on(CommandActions.getCurrentClient,(state, {commandNumber})=>{
-   const command= state.commands.find(cmd=>cmd.commandId===commandNumber)
+  on(CommandActions.getCurrentClient,(state, )=>{
+   const command= state.commands.at(0)
     if(command){
       const table=command.tables.find(t=>!t.tableOrdered);
       if(table){
@@ -66,140 +82,167 @@ export const commandReducer=createReducer(initialState,
     };
 
     }),
-  on(CommandActions.addItemForClient, (state, { commandNumber, tableNumber, clientIndex,item }) => {
-    const command = state.commands.find(cmd => cmd.commandId === commandNumber);
+  on(CommandActions.addItemForClient, (state, { tableNumber, clientIndex, item }) => {
+    const command = state.commands.at(0);
+
     if (command) {
-      const table = command.tables.find(t=>t.tableNumber===tableNumber);
+      const table = command.tables.find(t => t.tableNumber === tableNumber);
+
       if (table) {
-        const client=table.clients[clientIndex-1];
-        if(client){
-          const existingItem = client.items.find(it=> it.itemId === item.itemId);
+        const client = table.clients[clientIndex - 1];
+
+        if (client) {
+          const existingItem = client.items.find(it => it.itemId === item.itemId);
+
           const updatedItems = existingItem
-            ?  client.items.map(it =>
+            ? client.items.map(it =>
               it.itemId === item.itemId
-                ? { ...it, quantity: it.quantity + 1 }  // Exemple : incrémentation de la quantité
+                ? { ...it, quantity: it.quantity + 1 }
                 : it
             )
-            : [...client.items,item];
+            : [...client.items, item];
 
-            return {
-              ...state,
-              commands: state.commands.map(cmd =>
-                cmd.commandId === commandNumber
-                  ? {
-                    ...cmd,
-                    tables: cmd.tables.map((t) =>
-                      t.tableNumber === tableNumber
-                        ? {
-                          ...t,
-                          clients: t.clients.map((c, cIndex) =>
-                            cIndex === clientIndex
-                              ? {...c, items: updatedItems} // Ajouter l'item au client
-                              : c
-                          ),
-                        }
-                        : t
-                    ),
-                  }
-                  : cmd
-              ),
-            };
-          }
-
-
-
+          return {
+            ...state,
+            commands: [
+              {
+                ...command,
+                tables: command.tables.map(t =>
+                  t.tableNumber === tableNumber
+                    ? {
+                      ...t,
+                      clients: t.clients.map((c, cIndex) =>
+                        cIndex === clientIndex - 1
+                          ? { ...c, items: updatedItems }
+                          : c
+                      ),
+                    }
+                    : t
+                ),
+              },
+            ],
+          };
         }
       }
+    }
 
     return state;
   }),
-  on(CommandActions.removeItemForClient,(state, { commandNumber, tableNumber, clientIndex,itemToRemove })=>{
 
-    const command = state.commands.find(cmd => cmd.commandId === commandNumber);
+  on(CommandActions.removeItemForClient, (state, { tableNumber, clientIndex, itemToRemove }) => {
+    const command = state.commands.at(0);
+
     if (command) {
-      const table = command.tables.find(t=>t.tableNumber===tableNumber);
+      const table = command.tables.find(t => t.tableNumber === tableNumber);
+
       if (table) {
-        const client=table.clients[clientIndex-1];
-        if(client){
-          const moreThanOneItem = client.items.find(it=> it.itemId === itemToRemove.itemId&&it.quantity>1);
+        const client = table.clients[clientIndex - 1];
+
+        if (client) {
+          const moreThanOneItem = client.items.find(it => it.itemId === itemToRemove.itemId && it.quantity > 1);
+
           const updatedItems = moreThanOneItem
             ? client.items.map(it =>
               it.itemId === itemToRemove.itemId
-                ? { ...it, quantity: it.quantity - 1 }  // Exemple : décrémentation de la quantité
+                ? { ...it, quantity: it.quantity - 1 }
                 : it
             )
             : client.items.filter(item => item.itemId !== itemToRemove.itemId);
+
           return {
-              ...state,
-              commands: state.commands.map(cmd =>
-                cmd.commandId === commandNumber
-                  ? {
-                    ...cmd,
-                    tables: cmd.tables.map((t) =>
-                      t.tableNumber === tableNumber
-                        ? {
-                          ...t,
-                          clients: t.clients.map((c, cIndex) =>
-                            cIndex === clientIndex
-                              ? {...c, items: updatedItems} // Ajouter l'item au client
-                              : c
-                          ),
-                        }
-                        : t
-                    ),
-                  }
-                  : cmd
-              ),
-            };
-          }
-
-
-          }
-
+            ...state,
+            commands: [
+              {
+                ...command,
+                tables: command.tables.map(t =>
+                  t.tableNumber === tableNumber
+                    ? {
+                      ...t,
+                      clients: t.clients.map((c, cIndex) =>
+                        cIndex === clientIndex - 1
+                          ? { ...c, items: updatedItems }
+                          : c
+                      ),
+                    }
+                    : t
+                ),
+              },
+            ],
+          };
         }
-
+      }
+    }
 
     return state;
   }),
-  on(CommandActions.finishToCommandForClient,(state,{commandNumber, tableNumber, clientNumber})=>{
-    console.log("her",commandNumber, tableNumber, clientNumber)
-    const command=state.commands.find(cmd=>cmd.commandId===commandNumber);
-    if(command){
 
-    const table=  command.tables.find(table=>table.tableNumber===tableNumber);
-    if(table){
-const client =table.clients.at(clientNumber-1);
-      if(client){
-        const updatedClients = table.clients.map((c, cIndex) =>
-          cIndex === clientNumber - 1 ? { ...c, clientOrdered: true } : c
-        );
-        const allClientsOrdered = updatedClients.every(c => c.clientOrdered);
-        console.log("cli",client)
-        return {
-          ...state,
-          commands: state.commands.map(cmd =>
-            cmd.commandId === commandNumber
-              ? {
-                ...cmd,
-                tables: cmd.tables.map((t) =>
+  on(CommandActions.finishToCommandForClient, (state, { tableNumber, clientNumber }) => {
+    const command = state.commands.at(0);
+
+    if (command) {
+      const table = command.tables.find(table => table.tableNumber === tableNumber);
+
+      if (table) {
+        const client = table.clients.at(clientNumber - 1);
+
+        if (client) {
+          const updatedClients = table.clients.map((c, cIndex) =>
+            cIndex === clientNumber - 1 ? { ...c, clientOrdered: true } : c
+          );
+
+          const allClientsOrdered = updatedClients.every(c => c.clientOrdered);
+
+          return {
+            ...state,
+            commands: [
+              {
+                ...command,
+                tables: command.tables.map((t) =>
                   t.tableNumber === tableNumber
                     ? {
                       ...t,
                       clients: updatedClients,
-                    tableOrdered:allClientsOrdered
+                      tableOrdered: allClientsOrdered
                     }
                     : t
-                ),
+                )
               }
-              : cmd
-          ),
-        };
+            ]
+          };
+        }
       }
     }
-    }
-    console.log("comm",command)
-return state;
+
+    return state;
   }),
+
+  on(CommandActions.copyCommandForCurrentClient,(state,{otherClientIndex})=>{
+    const command= state.commands[0]
+    if(command){
+      const table=command.tables.find(t=>!t.tableOrdered);
+      if(table){
+        const client= table.clients.find(c=>!c.clientOrdered)
+        const otherClient=table.clients.at(otherClientIndex)
+        if(client&&otherClient){
+          const itemsForCurrent=otherClient.items
+          const tableOrdered=client===table.clients.at(table.clients.length-1)
+        const updatedClients=table.clients.map(c=>c===client?{...c,items:[...itemsForCurrent],clientOrdered:true,tableOrdered:tableOrdered}:c);
+          const updatedTables=command.tables.map(t=>t==table?{...t,clients:updatedClients,}:t);
+          return{
+            ...state,
+            commands:[
+              {
+                ...command,
+                tables: updatedTables
+              }
+            ]
+          }
+        }
+        }
+      }
+    return state;
+
+  })
 );
 
 export const commandsFeature = createFeature({
