@@ -8,6 +8,7 @@ import { Store } from '@ngrx/store';
 import { TableButtonComponent } from "../../shared/table/table.component";
 import { ReservationState } from "../table-reservation/reservation.reducer";
 import { clearSelectedTables } from "../table-reservation/reservation.actions";
+import {OrderService} from "../orderService";
 
 @Component({
   standalone: true,
@@ -24,6 +25,7 @@ export class PaymentMethodComponent implements OnInit {
   tables: Array<any> = [];
   payTablesBill: Array<any> = [];
   tablesTotal: number = 0;
+  private commandIdGlobal:string | null;
 
   payAll: boolean = false;
   serverLink: string = 'http://localhost:3003/dining';
@@ -34,9 +36,10 @@ export class PaymentMethodComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly httpClient: HttpClient,
-    private readonly store: Store<{ reservation: ReservationState }>
+    private readonly store: Store<{ reservation: ReservationState }>,private orderService:OrderService
   ) {
-    // Initialisation de selectedTables$ après injection de store
+   this.commandIdGlobal = this.route.snapshot.paramMap.get('count');
+   this.orderService.filterAndOrganizeOrders(this.commandIdGlobal!);
     this.selectedTables$ = this.store.select(state => state.reservation.selectedTables);
   }
 
