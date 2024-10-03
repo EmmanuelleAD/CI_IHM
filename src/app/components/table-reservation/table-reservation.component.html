@@ -1,31 +1,51 @@
-<div class="restaurant-floorplan">
+<div class="container">
+  <mat-card class="home-card">
 
-  <div class="kitchen-area">
-    <img src="assets/kitchen.png" alt="Kitchen" class="kitchen-image" />
-  </div>
-
-
-  <div class="bathroom-area">
-    <img src="assets/toilet.png" alt="Bathroom" class="bathroom-image" />
-  </div>
-
-  <div class="selection-info">
-    You can select up to {{ numberOfTables }} tables.
-  </div>
-
-  <!-- Tables Area -->
-  <div class="tables-container">
-    <div *ngFor="let table of tables" class="table">
-      <div class="table-card">
-        <img src="assets/table-chair.png" alt="Table" class="table-image"/>
-        <mat-card-title>Table {{ table.number }}</mat-card-title>
-        <mat-checkbox [(ngModel)]="table.selected" (change)="onSelectionChange()"></mat-checkbox>
-      </div>
+    <div class="m-2">
+      <h1>You can select up to {{ numberOfTables }} tables</h1>
     </div>
-  </div>
 
-  <!-- Next Button -->
-  <button class="start-button" mat-raised-button [disabled]="selectedCount === 0" (click)="navigateToNextPage()">
-    Next
-  </button>
+
+    <div class="tables-container grid">
+      <div class="col-5" *ngFor="let table of tables">
+        <mat-card
+          class="table"
+          [ngClass]="{'taken': table.taken || table.selected, 'available': !table.taken && !table.selected}"
+          (click)="toggleSelection(table)"
+        >
+          <mat-card-header>
+            <mat-card-title
+              [ngClass]="{'taken': table.taken || table.selected, 'available': !table.taken && !table.selected}"
+            >
+            Table {{ table.number }}
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <input
+              class="form-check-input custom-checkbox"
+              type="checkbox"
+              id="customCheckbox"
+              [(ngModel)]="table.selected"
+              [disabled]="table.taken || (selectedCount >= numberOfTables && !table.selected)"
+            />
+            <label class="form-check-label" [ngClass]="{'taken': table.taken || table.selected, 'available': !table.taken && !table.selected}">
+              select
+            </label>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      
+
+
+    </div>
+    <button
+      mat-raised-button
+      color="primary"
+      class="start-button"
+      [disabled]="selectedCount !== numberOfTables"
+      (click)="navigateToNextPage()"
+    >
+      Next
+    </button>
+  </mat-card>
 </div>

@@ -212,4 +212,11 @@ export class TableReservationComponent {
 
     this.router.navigate(['/menu']);
   }
+
+  toggleSelection(table: any) {
+    if (!table.taken && !(this.selectedCount >= this.numberOfTables && !table.selected)) {
+      table.selected = !table.selected;
+      this.onSelectionChange();
+    }
+  }
 }

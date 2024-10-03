@@ -2,30 +2,61 @@ import { Component } from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {Router} from "@angular/router";
 import {MatIconModule} from "@angular/material/icon";
-import {TableService} from "../table.service";
+import { ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Table } from '../../model/model';
+import { TableService } from '../table.service';
 
 @Component({
   selector: 'app-customer-count',
   standalone: true,
   imports: [CommonModule, MatIconModule],
   templateUrl: './customer-count.component.html',
-  styleUrls: ['./customer-count.component.scss']
+  styleUrl: './customer-count.component.css'
 })
 
 export class CustomerCountComponent {
-  count: string = '0'; // Représente le nombre de clients
+  count: string = '0';
+  type:string = "";
+  serverLink: string = "http://localhost:9500/";
+  tables: Table[] = [] as Table[];
+  countEmptyTables:number=0;
+  requiredNumberOfTables:number=0;
   tableNumber: string = '';  // Numéro de table généré sous forme "XXX"
   createdOrder: any; // Pour stocker la commande créée
   existingTableNumbers: string[] = []; // Stocke les numéros de tables existantes
+  constructor(private router: Router,  private tableService: TableService, private route: ActivatedRoute,private http: HttpClient,private snackBar: MatSnackBar) {
+    this.route.data.subscribe(data => {
+      this.type = data['type'];
+    });
+  }
 
-  constructor(private router: Router, private tableService: TableService) {}
-
-  // Incrémente le nombre de clients
+  ngOnInit(): void {
+    if (this.type=="customerCount") {     
+      this.http.get<Table[]>(this.serverLink + "dining/tables").subscribe({
+        next: (response: Table[]) => {
+          this.tables = response;
+          console.log(response);
+          this.countEmptyTables = this.tables.filter(table => !table.taken).length;
+        },
+        error: (error: any) => {
+          console.log("Error fetching tables", error);
+        }
+      });
+    }
+  }
+  openSnackBar(message: string, action: string = 'Close') {
+    this.snackBar.open(message, action, {
+      duration: 3000, // Duration in milliseconds
+      horizontalPosition: 'right', // Can be 'start', 'center', 'end', 'left', or 'right'
+      verticalPosition: 'top', // Can be 'top' or 'bottom'
+    });
+  }
   increment() {
     this.count = (parseInt(this.count) + 1).toString();
   }
 
-  // Décrémente le nombre de clients
   decrement() {
     const currentCount = parseInt(this.count);
     if (currentCount > 0) {
@@ -33,26 +64,22 @@ export class CustomerCountComponent {
     }
   }
 
-  // Ajoute un chiffre au compteur
   appendNumber(value: string) {
     if (this.count === '0') {
-      this.count = value;  // Remplace le zéro initial
+      this.count = value;  // Replace initial zero
     } else {
-      this.count += value;  // Ajoute le nombre
+      this.count += value;  // Append the number
     }
   }
 
-  // Réinitialise le compteur
   clearNumber() {
-    this.count = '0';  // Réinitialise à zéro
+    this.count = '0';  // Reset to zero
   }
 
-  // Supprime le dernier chiffre du compteur
   deleteLast() {
-    this.count = this.count.length > 1 ? this.count.slice(0, -1) : '0';  // Supprime le dernier caractère
+    this.count = this.count.length > 1 ? this.count.slice(0, -1) : '0';  // Delete the last character
   }
 
-  // Génére un numéro de table de type XXX qui n'existe pas déjà
   generateUniqueTableNumber(): string {
     let tableNumber: string;
     do {
@@ -60,23 +87,34 @@ export class CustomerCountComponent {
     } while (this.existingTableNumbers.includes(tableNumber));  // Vérifie si le numéro existe déjà
     return tableNumber;
   }
-
-  // Valide le nombre de clients et génère un ordre global
   validateButton() {
-    const customersCount = parseInt(this.count);  // Récupère le nombre de clients sous forme numérique
+    console.log("typesss");
+    console.log(this.type);
+    if (this.type == "customerCount") {
+      this.requiredNumberOfTables=Math.ceil(parseInt(this.count, 10) / 4);
+      if(this.requiredNumberOfTables>this.countEmptyTables){
+        console.log("too many clients");
+        this.openSnackBar("There is not enough available tables,please wait!");
+      }
+      else{
+        const customersCount = parseInt(this.count);  // Récupère le nombre de clients sous forme numérique
 
-    this.tableService.getAllTables().subscribe(tables => {
-      // Stocke tous les numéros de tables existants
-      this.existingTableNumbers = tables.map((table: any) => table.number);
-
-
-      this.tableNumber = this.generateUniqueTableNumber();
-
-      // Crée ensuite la table
-      this.createTable(this.tableNumber, customersCount);
-      this.router.navigate(['/table-reservation', this.count,this.tableNumber]);
-    });
-
+        this.tableService.getAllTables().subscribe(tables => {
+          // Stocke tous les numéros de tables existants
+          this.existingTableNumbers = tables.map((table: any) => table.number);
+    
+    
+          this.tableNumber = this.generateUniqueTableNumber();
+    
+          // Crée ensuite la table
+          this.createTable(this.tableNumber, customersCount);
+          this.router.navigate(['/table-reservation', this.count,this.tableNumber]);
+        });
+      }
+    }
+    else{
+      this.router.navigate(['/payment-method', this.count]);
+    }
 
   }
 
@@ -103,5 +141,4 @@ export class CustomerCountComponent {
       }
     );
   }
-
 }

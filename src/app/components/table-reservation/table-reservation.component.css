@@ -1,135 +1,46 @@
-.restaurant-floorplan {
-  position: relative;
-  width: 100%;
-  height: 700px;
-  overflow: visible;
+/* table-reservation.component.css */
+
+.container {
   padding: 20px;
-  background-color: #f8f8f8;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
-.kitchen-area {
-  position: absolute;
-  top: 20px;
-  left: 10px;
-  width: 150px;
-  height: 120px;
-  z-index: 10;
-  background-color: #e0e0e0;
-  border: 2px solid #555;
-}
-
-.kitchen-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.bathroom-area {
-  position: absolute;
-  top: 20px;
-  right: 10px;
-  width: 120px;
-  height: 100px;
-  z-index: 10;
-  background-color: #e0e0e0;
-  border: 2px solid #555;
-}
-
-.bathroom-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.selection-info {
-  margin-top: 20px;
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  color: #333;
 }
 
 .tables-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
   gap: 30px;
-  padding-top: 50px;
-  justify-items: center;
-  width: 100%;
+  padding: 60px;
+
 }
 
 .table {
-  position: relative;
-  width: 100px;
-  height: 140px;
-  background-color: #fff;
-  border: 2px solid #ddd;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  width: 100%;
 }
 
-.table:hover {
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+.taken {
+  background-color: #aaaaaa; /* Couleur pour les tables réservées */
+  color: white;
 }
 
-.table img {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-}
-
-.table-available {
-  background-color: lightgreen;
-}
-
-.table-taken {
-  background-color: lightcoral;
-}
-
-.mat-checkbox {
-  margin-top: 10px;
+.available {
+  background-color: #06ec19;/* Couleur pour les tables disponibles */
+  color: white;
 }
 
 .start-button {
   margin-top: 20px;
-  width: 150px;
-  height: 50px;
-  font-size: 18px;
-  text-align: center;
-  background-color: #007bff;
   color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  align-self: center;
+  background-color: #4a90e2;;
+}
+.start-button:hover {
+  background-color: #357ab6;
+}
+.custom-checkbox:checked {
+  background-color: rgb(0,178,0);
+  border-color: rgb(0,178,0);
 }
 
-.start-button[disabled] {
-  background-color: #ddd;
-  cursor: not-allowed;
-}
-
-@media (max-width: 768px) {
-  .tables-container {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .table {
-    width: 90px;
-    height: 120px;
-  }
-
-  .start-button {
-    width: 120px;
-    height: 40px;
-    font-size: 16px;
-  }
+.form-check-label {
+  margin-left: 10px; /* You can adjust the value as needed */
 }
