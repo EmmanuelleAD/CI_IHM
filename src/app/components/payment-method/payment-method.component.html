@@ -1,29 +1,26 @@
-<div *ngIf="tables.length" class="container my-4">
+<div *ngIf="ordersMapTables.length" class="container my-4">
   
-  <h1 class="mb-4 text-center">Command Number: {{ commandId }}</h1>
+  <h1 class="mb-4 text-center">Command Number: {{ commandIdGlobal }}</h1>
 
   <h3 class="mb-3 text-center">Select Tables To Pay:</h3>
 
-  <!-- Alert Box -->
   <div *ngIf="showAlert" class="alert alert-warning alert-dismissible fade show" role="alert">
     {{ alertMessage }}
     <button type="button" class="btn-close" aria-label="Close" (click)="closeAlert()"></button>
   </div>
 
-  <!-- Tables Section -->
   <div class="table-buttons-container card shadow-sm p-4">
     <div class="row justify-content-center">
-      <div *ngFor="let table of tables" class="col-6 col-md-4 col-lg-3 mb-3 d-flex justify-content-center">
+      <div *ngFor="let table of ordersMapTables" class="col-6 col-md-4 col-lg-3 mb-3 d-flex justify-content-center">
         <app-table
-          [number]="table.tableNumber"
-          [disabled]="table.tablePaid"
-          (click)="selectTable(table, table.tablePaid)">
+          [number]="table"
+          [disabled]="ordersMap[table.toString()]['tablePaid']"
+          (click)="selectTable(table, ordersMap[table.toString()]['tablePaid'],ordersMap[table.toString()])">
         </app-table>
       </div>
     </div>
   </div>
 
-  <!-- Selected Table Section -->
   <div *ngIf="selectedTable" class="mt-4 card shadow-sm p-4">
     <h4 class="mb-3">Selected Table: {{ selectedTable }}</h4>
     <label class="mb-2">Would you like to pay for:</label>
@@ -33,7 +30,6 @@
     </div>
   </div>
 
-  <!-- Whole Table Payment Section -->
   <div *ngIf="payAll" class="mt-4 card shadow-sm p-4">
     <h4 class="mb-3">Bill for the selected Tables: {{ tablesTotal | currency }}</h4>
     <div class="accordion" id="accordionExample">
@@ -50,7 +46,7 @@
           <div class="accordion-body">
             <ul class="list-group">
               <li class="list-group-item" *ngFor="let client of bill.clients">
-                Client {{ client.clientNumber }} Total: {{ client.price | currency }}
+                Client {{ client.clientId }} Total: {{ client.total | currency }}
               </li>
             </ul>
           </div>

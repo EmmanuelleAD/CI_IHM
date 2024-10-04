@@ -8,10 +8,12 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import {provideState, provideStore} from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import {commandReducer, commandsFeature} from "./stores/command.reducer";
+import { reservationFeature } from './components/table-reservation/reservation.reducer';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(),
-    provideHttpClient(), provideAnimationsAsync(), provideStore(),provideState(commandsFeature), provideEffects(), provideAnimationsAsync()]
+    provideHttpClient(), provideAnimationsAsync(), provideStore(),provideState(reservationFeature),provideState(commandsFeature), provideEffects(), provideAnimationsAsync()]
 };

@@ -1,5 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { selectTable, unselectTable, clearSelectedTables } from './reservation.actions';
+import {createFeature} from "@ngrx/store";
 
 export interface ReservationState {
   selectedTables: number[];
@@ -25,3 +26,10 @@ export const reservationReducer = createReducer(
   }))
 
 );
+
+export const reservationFeature = createFeature({
+  name: 'reservation',
+  reducer: reservationReducer  // le reducer plus haut
+});
+
+
