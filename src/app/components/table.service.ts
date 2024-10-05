@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import {TableBack} from "../interfaces/TableBack";
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class TableService {
   }
 
   createTableOrder(tableNumber: number, customersCount: number): Observable<any> {
-    const payload = { "tableNumber":tableNumber, "customersCount":customersCount };
+    const payload :TableBack ={ tableNumber:tableNumber, customersCount:customersCount };
     return this.http.post(`${this.baseUrl}/tableOrders`, payload);
   }
 

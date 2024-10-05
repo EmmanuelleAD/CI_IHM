@@ -91,7 +91,7 @@ export class TableReservationComponent implements OnInit{
     this.http.get<Table[]>(this.backendUrl).subscribe({
       next: (response: Table[]) => {
         this.tables = response
-          .filter(table => table.number < 100)
+          .filter(table => table.number < 100&&!table.taken)
           .map((table, index) => ({
             ...table,
             positionX: (index % 5) * 120,
@@ -118,7 +118,7 @@ export class TableReservationComponent implements OnInit{
 
     tablesSelectionnees.forEach((t => {
       const clientsLimit = (t === tablesSelectionnees[tablesSelectionnees.length - 1] && totalClients % clientsParTable) ? totalClients % clientsParTable : clientsParTable;
-this.serviceTable.createTableOrder(t.number,1);
+this.serviceTable.createTableOrder(t.number,1).subscribe();
       for (let client = 1; client <= clientsLimit; client++) {
         const tableNumber = t.number.toString().padStart(3, '0');
         const clientNumber = (client).toString().padStart(3, '0');
@@ -153,7 +153,7 @@ this.serviceTable.createTableOrder(t.number,1);
   navigateToNextPage() {
     this.repartirClientsSurTables(this.numberOfCustomers,this.tableNumberGlobal,4).subscribe(()=>{
       this.router.navigate(['/menu']).then(()=>this.orderService.filterAndOrganizeOrders(this.tableNumberGlobal.toString()).subscribe(ordersMap=>{
-        this.store.dispatch(setCommands({orderDictionary:ordersMap}))
+        this.store.dispatch(setCommands({orderDictionary:ordersMap,commandNumber:this.tableNumberGlobal}))
         console.log("order",ordersMap)
       }));
 

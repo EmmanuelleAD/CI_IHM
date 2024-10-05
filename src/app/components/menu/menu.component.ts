@@ -33,8 +33,9 @@ export class MenuComponent implements OnInit{
   items: MenuItem[] = [];
   cart: MenuItem[] = [];
   private store=inject(Store);
-  commandNumber:number=-1;
+  commandNumber:number|null=null;
   currentClient$:Observable<ClientPosition|null>=this.store.select(selectCurrentClient).pipe( );
+  commandNumber$:Observable<number>=new Observable();
   isTheFirst$?: Observable<boolean>=
   this.currentClient$.pipe(
     filter((client: ClientPosition | null) => !!client),
