@@ -1,9 +1,6 @@
-
-<mat-card class="category-card" appearance="outlined" (click)="setCategory()">
-    <img mat-card-image [src]="imageLink" alt="category image"  class="image">
-    <mat-card-actions class="action-card">
-      <button  class="action-button" > {{title}}</button>
-    </mat-card-actions>
-  </mat-card>
-
-
+<mat-card class="category-card shadow-sm" appearance="outlined" (click)="setCategory()">
+  <img mat-card-image [src]="imageLink" alt="category image" class="image img-fluid rounded">
+  <mat-card-actions class="action-card text-center">
+    {{title}}
+  </mat-card-actions>
+</mat-card>
