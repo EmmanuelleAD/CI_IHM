@@ -14,57 +14,7 @@ export interface CommandState {
 }
 
 const initialState:CommandState={
-  commands:[{
-    commandId:1234,
-    tables: [
-      {
-        table: "66f0069108fb778e348bb92f",
-        tablePaid: false,
-        tableNumber: 1,
-        tableOrdered:false,
-        clients: [
-          {
-            client: "1",
-            clientPaid: false,
-            clientOrdered:false,
-            items: [
-
-            ]
-            ,orderId:"13333"
-          },
-          {
-            client: "2",
-            clientPaid: false,
-            clientOrdered:false,
-            items: [
-
-            ],
-          orderId:"13333"
-
-},
-          {
-            client: "3",
-            clientPaid: false,
-            clientOrdered:false,
-            items: [
-
-            ]
-            ,orderId:"13333"
-
-}, {
-            client: "4",
-            clientPaid: false,
-            clientOrdered:false,
-            items: [
-
-            ]
-            ,orderId:"13333"
-
-          }]
-
-      }
-    ]
-  }],
+  commands:[],
   currentClient:null
 }
 export const commandReducer=createReducer(initialState,
@@ -188,7 +138,7 @@ export const commandReducer=createReducer(initialState,
 
   on(CommandActions.finishToCommandForClient, (state, { tableNumber, clientNumber }) => {
     const command = state.commands.at(0);
-
+console.log(command)
     if (command) {
       const table = command.tables.find(table => table.tableNumber === tableNumber);
 
@@ -235,9 +185,11 @@ export const commandReducer=createReducer(initialState,
         const otherClient=table.clients.at(otherClientIndex)
         if(client&&otherClient){
           const itemsForCurrent=otherClient.items
-          const tableOrdered=client===table.clients.at(table.clients.length-1)
-        const updatedClients=table.clients.map(c=>c===client?{...c,items:[...itemsForCurrent],clientOrdered:true,tableOrdered:tableOrdered}:c);
-          const updatedTables=command.tables.map(t=>t==table?{...t,clients:updatedClients,}:t);
+          console.log("c'est le dernier",client,table.clients.length-1,table.clients.indexOf(client))
+          const tableOrdered:boolean=table.clients.indexOf(client)===table.clients.length-1
+          console.log(tableOrdered)
+        const updatedClients=table.clients.map(c=>c===client?{...c,items:[...itemsForCurrent],clientOrdered:true}:c);
+          const updatedTables=command.tables.map(t=>t==table?{...t,clients:updatedClients,tableOrdered:tableOrdered}:t);
           return{
             ...state,
             commands:[
@@ -253,13 +205,11 @@ export const commandReducer=createReducer(initialState,
     return state;
 
   }),
-  on(CommandActions.setCommands, (state, { orderDictionary }) => {
-    const command = state.commands[0];  // On récupère la première commande
+  on(CommandActions.setCommands, (state, { orderDictionary,commandNumber }) => {
 console.log("a")
-    if (command) {
       console.log("h",orderDictionary)
       const updatedTables :Table[] = Object.values(orderDictionary).map((t:TableDto)=>({
-        table: `${command.commandId}${t.tableNumber}`,
+        table: `${commandNumber}${t.tableNumber}`,
         tableNumber:t.tableNumber,
         tablePaid: false,              // Initialisation du paiement de la table
         tableOrdered: false,
@@ -272,22 +222,19 @@ console.log("a")
           })
         )
       })
-      // Mappage des nouvelles tables reçues via `tables` (de type TableDto[])
   );
       console.log(updatedTables)
-console.log("r")
       return {
         ...state,
+        currentClient:null,
         commands: [
           {
-            ...command,
+            commandId:commandNumber,
             tables: updatedTables  // Mise à jour des tables dans l'état
           }
-        ]
-      };
-    }
+        ],
 
-    return state;  // Si pas de commande, renvoie l'état inchangé
+      };
   })
 );
 

@@ -18,7 +18,7 @@ export const removeItemForClient=createAction(
 
 );
 export const setCommands = createAction('[Command] Update command after the choice of tables',
-  props<{ orderDictionary: OrderDictionary }>()
+  props<{ orderDictionary: OrderDictionary,commandNumber:number }>()
 );
 export const finishToCommandForClient=createAction(
   '[Command] Finish to command for client',
