@@ -29,3 +29,7 @@ export const isTheFirstToCommand=createAction(
   '[Command] Get is the first to command ',props<{clientNumber:number}>()
 
 );
+export const payForClient = createAction(
+  '[Command] Pay for client',
+  props<{ tableNumber: number; clientNumber: number }>()
+);

@@ -253,6 +253,46 @@ export const commandReducer=createReducer(initialState,
     return state;
 
   }),
+  on(CommandActions.payForClient, (state, { tableNumber, clientNumber }) => {
+    const command = state.commands.at(0);
+
+    if (command) {
+      const table = command.tables.find(table => table.tableNumber === tableNumber);
+
+      if (table) {
+        const client = table.clients.at(clientNumber - 1);
+
+        if (client) {
+          const updatedClients = table.clients.map((c, cIndex) =>
+            cIndex === clientNumber - 1 ? { ...c, clientPaid: true } : c
+          );
+
+          const allClientsPaid = updatedClients.every(c => c.clientPaid);
+
+          return {
+            ...state,
+            commands: [
+              {
+                ...command,
+                tables: command.tables.map(t =>
+                  t.tableNumber === tableNumber
+                    ? {
+                      ...t,
+                      clients: updatedClients,
+                      tablePaid: allClientsPaid,
+                    }
+                    : t
+                ),
+              },
+            ],
+          };
+        }
+      }
+    }
+
+    return state;
+  }),
+
   on(CommandActions.setCommands, (state, { orderDictionary }) => {
     const command = state.commands[0];  // On récupère la première commande
 console.log("a")

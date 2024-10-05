@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {Router} from "@angular/router";
 import {MatIconModule} from "@angular/material/icon";
@@ -7,6 +7,9 @@ import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Table } from '../../model/model';
 import { TableService } from '../table.service';
+import {setCommands} from "../../stores/command.action";
+import {OrderService} from "../orderService";
+import {Store} from "@ngrx/store";
 
 @Component({
   selector: 'app-customer-count',
@@ -22,18 +25,19 @@ export class CustomerCountComponent {
   serverLink: string = "http://localhost:9500/";
   tables: Table[] = [] as Table[];
   countEmptyTables:number=0;
+  private store=inject(Store);
   requiredNumberOfTables:number=0;
   tableNumber: string = '';  // Numéro de table généré sous forme "XXX"
   createdOrder: any; // Pour stocker la commande créée
   existingTableNumbers: string[] = []; // Stocke les numéros de tables existantes
-  constructor(private router: Router,  private tableService: TableService, private route: ActivatedRoute,private http: HttpClient,private snackBar: MatSnackBar) {
+  constructor(private router: Router,  private tableService: TableService, private route: ActivatedRoute,private http: HttpClient,private snackBar: MatSnackBar,private orderService:OrderService) {
     this.route.data.subscribe(data => {
       this.type = data['type'];
     });
   }
 
   ngOnInit(): void {
-    if (this.type=="customerCount") {     
+    if (this.type=="customerCount") {
       this.http.get<Table[]>(this.serverLink + "dining/tables").subscribe({
         next: (response: Table[]) => {
           this.tables = response;
@@ -102,10 +106,10 @@ export class CustomerCountComponent {
         this.tableService.getAllTables().subscribe(tables => {
           // Stocke tous les numéros de tables existants
           this.existingTableNumbers = tables.map((table: any) => table.number);
-    
-    
+
+
           this.tableNumber = this.generateUniqueTableNumber();
-    
+
           // Crée ensuite la table
           this.createTable(this.tableNumber, customersCount);
           this.router.navigate(['/table-reservation', this.count,this.tableNumber]);
@@ -113,7 +117,10 @@ export class CustomerCountComponent {
       }
     }
     else{
-      this.router.navigate(['/payment-method', this.count]);
+      this.router.navigate(['/payment-method', this.count]).then(()=>this.orderService.filterAndOrganizeOrders(this.count).subscribe(ordersMap=>{
+        this.store.dispatch(setCommands({orderDictionary:ordersMap}))
+        console.log("order",ordersMap)
+      }));
     }
 
   }

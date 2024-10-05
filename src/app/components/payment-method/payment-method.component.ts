@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { filter, Observable, take } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { selectTable, unselectTable } from '../../components/table-reservation/reservation.actions'; 
+import { selectTable, unselectTable } from '../../components/table-reservation/reservation.actions';
 
 import { TableButtonComponent } from "../../shared/table/table.component";
 import { ReservationState } from "../table-reservation/reservation.reducer";
-import { clearSelectedTables } from "../table-reservation/reservation.actions";
+
 import {OrderService} from "../orderService";
-import { OrderManager } from '../OrderManager';
+
 
 @Component({
   standalone: true,
@@ -34,14 +34,14 @@ export class PaymentMethodComponent implements OnInit {
   showAlert = false;
   alertMessage: string = '';
 
-  ordersMap: { [key: string]: any } = {}; 
+  ordersMap: { [key: string]: any } = {};
   ordersMapTables: number[]= [];
 
   // Utilisation de readonly pour garantir que 'store' est injecté et ne change pas après
   constructor(
     private readonly route: ActivatedRoute,
     private readonly httpClient: HttpClient,
-    private readonly store: Store<{ reservation: ReservationState }>,private orderService:OrderService
+    private readonly store: Store<{ reservation: ReservationState }>,private router: Router,private orderService:OrderService
   ) {
     this.selectedTables$ = this.store.select(state => state.reservation.selectedTables);
     this.commandIdGlobal = this.route.snapshot.paramMap.get('count');
@@ -54,13 +54,13 @@ export class PaymentMethodComponent implements OnInit {
     this.orderService.filterAndOrganizeOrders(this.commandIdGlobal!).subscribe({
       next: (ordersMap) => {
         this.ordersMap = ordersMap;
-        this.ordersMapTables = Object.keys(ordersMap).map(key => parseInt(key, 10));
+               this.ordersMapTables = Object.keys(ordersMap).map(key => parseInt(key, 10));
         Object.keys(ordersMap).forEach(tableNumber => {
           this.ordersMap[tableNumber]['tableTotal'] = 0;
           this.ordersMap[tableNumber]['tablePaid'] = this.ordersMap[tableNumber]['clients'].every((client: any) => {
             return client.clientPaid === true;
           });
-          
+
           this.ordersMap[tableNumber]['clients'].forEach((client: any) => {
             // Get client order details
 
@@ -94,7 +94,7 @@ export class PaymentMethodComponent implements OnInit {
       }
     });
   }
-  
+
 
   loadClientsFromReservations(): void {
     console.log("order Map ", this.ordersMap);
@@ -141,7 +141,7 @@ export class PaymentMethodComponent implements OnInit {
   }
 
   choosePaymentMethod(method: 'whole' | 'individual' | 'multipleTables'): void {
-    //Redirection ou gestion du mode de paiement
+    this.router.navigate(['/payment-review', this.commandIdGlobal,this.selectedTable]);
   }
 
   calculateTotal(selectedTables: number[]): void {
@@ -153,7 +153,7 @@ export class PaymentMethodComponent implements OnInit {
       this.tablesTotal += tableBill['tableTotal'];
       tableBill['clients'] = this.ordersMap[tableNumber]["clients"];
       this.payTablesBill .push(tableBill)
-      
+
 
     })
   }
@@ -166,12 +166,12 @@ export class PaymentMethodComponent implements OnInit {
         selectedTables.forEach(selectedTable =>{
           this.ordersMap[selectedTable]['clients'].forEach((client:any) => {
             this.httpClient.post(`${this.serverLink}tableOrders/${client['orderId']}/bill`,{}).subscribe({
-              next: (response) => {        
+              next: (response) => {
                 this.ngOnInit();
               },
               error: (error) => this.logError(error)
             });
-            
+
           });
         });
       },
@@ -192,5 +192,6 @@ export class PaymentMethodComponent implements OnInit {
 
   logError(error: any): void {
     console.error('Erreur détectée:', error);
+
   }
 }
