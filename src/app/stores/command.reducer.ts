@@ -4,6 +4,9 @@ import * as CommandActions from './command.action'
 import {OrderClient} from "../interfaces/OrderClient";
 import {finishToCommandForClient, getCurrentClient} from "./command.action";
 import {state} from "@angular/animations";
+import {ClientDto, TableDto} from "../components/table-reservation/table-reservation.component";
+import {Table} from "../interfaces/Table";
+import {Client} from "../interfaces/Client";
 export interface CommandState {
   commands:Command[];
   currentClient:OrderClient|null;
@@ -242,6 +245,40 @@ export const commandReducer=createReducer(initialState,
       }
     return state;
 
+  }),
+  on(CommandActions.setCommands, (state, { tablesToCreate }) => {
+    const command = state.commands[0];  // On récupère la première commande
+console.log("a")
+    if (command) {
+      console.log("h",tablesToCreate)
+      // Mappage des nouvelles tables reçues via `tables` (de type TableDto[])
+      const updatedTables :Table[]= tablesToCreate.tables.map((t: TableDto) => ({
+        table: String(t.tableNumber),
+        tableNumber:t.tableNumber,
+          tablePaid: false,              // Initialisation du paiement de la table
+          tableOrdered: false,
+        clients :t.clients.map((c: ClientDto) => ({
+          client: c.clientId,
+          clientOrdered: false,   // On initialise la commande du client à `false`
+          clientPaid: false,      // On initialise le paiement du client à `false`
+          items: [],              // Liste d'items vide
+        })
+        )
+      }));
+      console.log(updatedTables)
+console.log("r")
+      return {
+        ...state,
+        commands: [
+          {
+            ...command,
+            tables: updatedTables  // Mise à jour des tables dans l'état
+          }
+        ]
+      };
+    }
+
+    return state;  // Si pas de commande, renvoie l'état inchangé
   })
 );
 
