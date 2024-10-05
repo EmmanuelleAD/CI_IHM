@@ -1,10 +1,8 @@
 import {CommandState} from "./command.reducer";
-import {state} from "@angular/animations";
-import {createFeatureSelector, createSelector, on} from "@ngrx/store";
-import {OrderClient} from "../interfaces/OrderClient";
-import {getCurrentClient} from "./command.action";
-import * as CommandActions from "./command.action";
-import {Command} from "../interfaces/Command";
+import {createFeatureSelector, createSelector} from "@ngrx/store";
+import {ClientPosition} from "../interfaces/ClientPosition";
+import {ClientOrder} from "../interfaces/ClientOrder";
+
 export interface AppState {
   commandState: CommandState;
 }
@@ -30,17 +28,38 @@ export const selectCurrentClient=
     (commands) => { console.log("com",commands)
       if (commands&&commands.length > 0) {
 
-        const command = commands[0]; // Vous pouvez ajuster cette logique selon vos besoins
+        const command = commands[0];
+        console.log("comma",commands[0])
         const table = command.tables.find(t => !t.tableOrdered);
         if (table) {
           const client = table.clients.find(c => !c.clientOrdered);
           if (client) {
-            const currentClient: OrderClient = {
+            const currentClient: ClientPosition = {
               clientNumber: table.clients.indexOf(client) + 1,
               tableNumber: table.tableNumber,
               commandNumber: command.commandId
             };
             return currentClient;
+          }
+        }
+      }
+      return null;
+    });
+
+export const selectCurrentClientOrder=
+  createSelector(selectCommands,
+    (commands) => { console.log("com",commands)
+      if (commands&&commands.length > 0) {
+
+        const command = commands[0];
+        const table = command.tables.find(t => !t.tableOrdered);
+        if (table) {
+          const client = table.clients.find(c => !c.clientOrdered);
+          if (client) {
+            return {
+              orderId: client.orderId,
+              items: client.items
+            } as ClientOrder;
           }
         }
       }

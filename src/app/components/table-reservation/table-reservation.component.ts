@@ -12,7 +12,9 @@ import {toObservable} from "@angular/core/rxjs-interop";
 import {OrderManagerCopyService} from "../order-manager-copy.service";
 import {Store} from "@ngrx/store";
 import {addItemForClient, setCommands} from "../../stores/command.action";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, forkJoin, Observable, of, switchMap, tap} from "rxjs";
+import {OrderService} from "../orderService";
+import {map} from "rxjs/operators";
 
 export   interface ClientDto {            // Liste des clients associés à cette table
   clientId: string;   // Le numéro du client (ZZZ)
@@ -38,8 +40,8 @@ export  interface TablesDto{
  tables: TableDto[]
 }
 export interface OrderDictionary {
-  [commandId: string]:
-   TableDto[]
+  [tableNumber: number]:
+   TableDto
   ;
 }
 
@@ -75,7 +77,7 @@ export class TableReservationComponent implements OnInit{
   a$:BehaviorSubject<TablesDto|null>
 =new BehaviorSubject<TablesDto|null>( null);
   private store=inject(Store);
-  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router,private  serviceTable:TableService,private  orderManager:OrderManagerCopyService) { }
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router,private  serviceTable:TableService,private  orderService:OrderService) { }
 
   ngOnInit(): void {
     this.getRealTables();
@@ -83,6 +85,8 @@ export class TableReservationComponent implements OnInit{
     const tableNumberGlobal = this.route.snapshot.paramMap.get('tableNumberGlobal');
     this.numberOfCustomers = count ? Number(count) : 0;
     this.tableNumberGlobal = tableNumberGlobal ? Number(tableNumberGlobal) : 0;
+    if(tableNumberGlobal)
+      this.orderService.globalOrderPrefix.next(tableNumberGlobal);
     this.numberOfTables = Math.ceil(this.numberOfCustomers / 4);
   }
 
@@ -111,153 +115,133 @@ export class TableReservationComponent implements OnInit{
 
 
 
-  repartirClientsSurTables(totalClients: number, globalOrderNumber: number, clientsParTable: number): string[] {
+  repartirClientsSurTables(totalClients: number, globalOrderNumber: number, clientsParTable: number): Observable<any> {
     const tablesSelectionnees = this.tables.filter(table => table.selected);
-    const result: string[] = [];
-    if (!this.ordersMap[globalOrderNumber]) {
-      this.ordersMap[globalOrderNumber] =
-        []
-      ;
-    }
     const globalPart = globalOrderNumber.toString().padStart(3, '0');
+    const observables:Observable<any>[] = [];
 
-    tablesSelectionnees.forEach((t=>{
-      let tableData:TableDto = {
-        tableNumber: t.number,  // Le `tableNumber` reste un nombre
-        clients: [] as { clientId: string; orderId: string }[]  // Type explicite pour les clients
-      };
-      const clientsLimit=(t===tablesSelectionnees[tablesSelectionnees.length-1]&&totalClients%clientsParTable)?totalClients%clientsParTable:clientsParTable
+    tablesSelectionnees.forEach((t => {
+      const clientsLimit = (t === tablesSelectionnees[tablesSelectionnees.length - 1] && totalClients % clientsParTable) ? totalClients % clientsParTable : clientsParTable;
+this.serviceTable.createTableOrder(t.number,1);
       for (let client = 1; client <= clientsLimit; client++) {
         const tableNumber = t.number.toString().padStart(3, '0');
         const clientNumber = (client).toString().padStart(3, '0');
         const commandIdForClientString = `${globalPart}${tableNumber}${clientNumber}`;
-        const commandIdForClient=Number(commandIdForClientString);
-        this.serviceTable.createTable(commandIdForClient).subscribe({
-          next: (tableResponse) => {
+        const commandIdForClient = Number(commandIdForClientString);
+
+        // Pousse les observables pour `createTable` et `createTableOrder`
+        const observable = this.serviceTable.createTable(commandIdForClient).pipe(
+          switchMap((tableResponse) => {
             console.log(`Table créée avec succès: ${commandIdForClient}`, tableResponse);
 
-            // Étape 2: Créer une commande pour cette table après sa création
-            this.serviceTable.createTableOrder(commandIdForClient, 1).subscribe({
-              next: (clientResponse) => {
-                console.log(`Commande créée avec succès pour le client ${client} à la table ${tableNumber}. Réponse:`, clientResponse);
-                // Ajouter les informations du client dans le tableau 'clients' de la table
-                tableData.clients.push({
-                  clientId: clientNumber,  // Utilisation du numéro de client (ZZZ)
-                  orderId: clientResponse._id,  // ID de la commande récupéré de la réponse
-                });
-                console.log(commandIdForClientString);
-                result.push(commandIdForClientString);
-              },
-              error: (error) => {
-                console.error(`Erreur lors de la création de la commande pour le client ${client} à la table ${tableNumber}:`, error);
-              }
-            });
-          },
-          error: (error) => {
-            console.error(`Erreur lors de la création de la table ${tableNumber}:`, error);
-          }
-        });
+            // Une fois la table créée, on crée une commande pour cette table
+            return this.serviceTable.createTableOrder(commandIdForClient, 1).pipe(
+              map(clientResponse => ({
+                tableNumber: t.number,
+                clientId: clientNumber,
+                orderId: clientResponse._id
+              }))
+            );
+          })
+        );
 
-      }
-      this.ordersMap[globalOrderNumber].push(tableData);
-      if(t===tablesSelectionnees[tablesSelectionnees.length-1]){
-        console.log("heho",result);
-        console.log("Appel de generateOrderJSON avec ordersMap :", this.ordersMap);
-        this.store.dispatch(setCommands({  tablesToCreate: {tables:this.ordersMap[globalOrderNumber.toString()]} }));
-        const ordersMapString = JSON.stringify(this.ordersMap);
-        localStorage.setItem('ordersMap', ordersMapString);
+        observables.push(observable);
       }
     }));
 
+    return forkJoin(observables).pipe();
 
-    return result;
   }
 
-  validerRepartition() {
-    const tablesSelectionnees = this.tables.filter(table => table.selected);  // Tables sélectionnées
-    console.log("Table Number Global:", this.tableNumberGlobal);
+  /* validerRepartition() {
+     const tablesSelectionnees = this.tables.filter(table => table.selected);  // Tables sélectionnées
+     console.log("Table Number Global:", this.tableNumberGlobal);
 
-    const clientsRepartis = this.repartirClientsSurTables(this.numberOfCustomers, this.tableNumberGlobal, 4);
-/*
-   // Dictionnaire pour stocker les commandes
-    let clientIndex = 0;
+     const clientsRepartis = this.repartirClientsSurTables(this.numberOfCustomers, this.tableNumberGlobal, ;
+ /*
+    // Dictionnaire pour stocker les commandes
+     let clientIndex = 0;
 
-    tablesSelectionnees.forEach((table) => {
-      const commandId = this.tableNumberGlobal.toString().padStart(3, '0');  // ID global de la commande (XXX)
-      const tableNumber = table.number.toString().padStart(3, '0');  // Numéro de la table (YYY)
+     tablesSelectionnees.forEach((table) => {
+       const commandId = this.tableNumberGlobal.toString().padStart(3, '0');  // ID global de la commande (XXX)
+       const tableNumber = table.number.toString().padStart(3, '0');  // Numéro de la table (YYY)
 
-      // Si la commande globale n'existe pas encore, on l'ajoute avec un tableau de tables
-      if (!this.ordersMap[commandId]) {
-        this.ordersMap[commandId] = {
-          tables: []
-        };
-      }
+       // Si la commande globale n'existe pas encore, on l'ajoute avec un tableau de tables
+       if (!this.ordersMap[commandId]) {
+         this.ordersMap[commandId] = {
+           tables: []
+         };
+       }
 
-      // Créer un objet pour la table actuelle
-      const tableData = {
-        tableNumber: Number(tableNumber),  // Le `tableNumber` reste un nombre
-        clients: [] as { clientId: string; orderId: string }[]  // Type explicite pour les clients
-      };
+       // Créer un objet pour la table actuelle
+       const tableData = {
+         tableNumber: Number(tableNumber),  // Le `tableNumber` reste un nombre
+         clients: [] as { clientId: string; orderId: string }[]  // Type explicite pour les clients
+       };
 
-      // Variable pour suivre les clients ajoutés
-      let clientsAjoutes = 0;
+       // Variable pour suivre les clients ajoutés
+       let clientsAjoutes = 0;
 
-      // Ajouter les clients dans cette table
-      for (let client = 1; client <= 4 && clientIndex < clientsRepartis.length; client++) {
-        const clientNumber = client.toString().padStart(3, '0');  // Numéro du client (ZZZ)
-        const complexTableNumber = Number(`${commandId}${tableNumber}${clientNumber}`);  // Numéro complexe sous forme de `number`
+       // Ajouter les clients dans cette table
+       for (let client = 1; client <= 4 && clientIndex < clientsRepartis.length; client++) {
+         const clientNumber = client.toString().padStart(3, '0');  // Numéro du client (ZZZ)
+         const complexTableNumber = Number(`${commandId}${tableNumber}${clientNumber}`);  // Numéro complexe sous forme de `number`
 
-        clientIndex++;
-        console.log(`Numéro complexe pour le client ${client}: ${complexTableNumber}`);
+         clientIndex++;
+         console.log(`Numéro complexe pour le client ${client}: ${complexTableNumber}`);
 
-        // Étape 1: Créer la table avec le numéro complexe
-        this.serviceTable.createTable(complexTableNumber).subscribe({
-          next: (tableResponse) => {
-            console.log(`Table créée avec succès: ${complexTableNumber}`, tableResponse);
+         // Étape 1: Créer la table avec le numéro complexe
+         this.serviceTable.createTable(complexTableNumber).subscribe({
+           next: (tableResponse) => {
+             console.log(`Table créée avec succès: ${complexTableNumber}`, tableResponse);
 
-            // Étape 2: Créer une commande pour cette table après sa création
-            this.serviceTable.createTableOrder(complexTableNumber, 1).subscribe({
-              next: (clientResponse) => {
-                console.log(`Commande créée avec succès pour le client ${client} à la table ${complexTableNumber}. Réponse:`, clientResponse);
+             // Étape 2: Créer une commande pour cette table après sa création
+             this.serviceTable.createTableOrder(complexTableNumber, 1).subscribe({
+               next: (clientResponse) => {
+                 console.log(`Commande créée avec succès pour le client ${client} à la table ${complexTableNumber}. Réponse:`, clientResponse);
 
-                // Ajouter les informations du client dans le tableau 'clients' de la table
-                tableData.clients.push({
-                  clientId: clientNumber,  // Utilisation du numéro de client (ZZZ)
-                  orderId: clientResponse._id,  // ID de la commande récupéré de la réponse
-                });
+                 // Ajouter les informations du client dans le tableau 'clients' de la table
+                 tableData.clients.push({
+                   clientId: clientNumber,  // Utilisation du numéro de client (ZZZ)
+                   orderId: clientResponse._id,  // ID de la commande récupéré de la réponse
+                 });
 
-                clientsAjoutes++;  // Incrémenter le nombre de clients ajoutés
+                 clientsAjoutes++;  // Incrémenter le nombre de clients ajoutés
 
-                // Si tous les clients pour cette table ont été ajoutés, on ajoute la table au tableau 'tables'
-                if (clientsAjoutes === 4 || clientIndex === clientsRepartis.length) {
-                  if (!this.ordersMap[commandId].tables.find(t => t.tableNumber === tableData.tableNumber)) {
-                    this.ordersMap[commandId].tables.push(tableData);
-                    console.log(`Table ajoutée à ordersMap pour la commande ${commandId}:`, this.ordersMap[commandId]);
-                  }
-                }
-              },
-              error: (error) => {
-                console.error(`Erreur lors de la création de la commande pour le client ${client} à la table ${complexTableNumber}:`, error);
-              }
-            });
-          },
-          error: (error) => {
-            console.error(`Erreur lors de la création de la table ${complexTableNumber}:`, error);
-          }
-        });
-      }
-    });
+                 // Si tous les clients pour cette table ont été ajoutés, on ajoute la table au tableau 'tables'
+                 if (clientsAjoutes === 4 || clientIndex === clientsRepartis.length) {
+                   if (!this.ordersMap[commandId].tables.find(t => t.tableNumber === tableData.tableNumber)) {
+                     this.ordersMap[commandId].tables.push(tableData);
+                     console.log(`Table ajoutée à ordersMap pour la commande ${commandId}:`, this.ordersMap[commandId]);
+                   }
+                 }
+               },
+               error: (error) => {
+                 console.error(`Erreur lors de la création de la commande pour le client ${client} à la table ${complexTableNumber}:`, error);
+               }
+             });
+           },
+           error: (error) => {
+             console.error(`Erreur lors de la création de la table ${complexTableNumber}:`, error);
+           }
+         });
+       }
+     });
 
-    console.log("Appel de generateOrderJSON avec ordersMap :", this.ordersMap);
-    const ordersMapString = JSON.stringify(this.ordersMap);
-    localStorage.setItem('ordersMap', ordersMapString);*/
+     console.log("Appel de generateOrderJSON avec ordersMap :", this.ordersMap);
+     const ordersMapString = JSON.stringify(this.ordersMap);
+     localStorage.setItem('ordersMap', ordersMapString);
   }
 
-
+*/
   navigateToNextPage() {
-    this.validerRepartition();
+    this.repartirClientsSurTables(this.numberOfCustomers,this.tableNumberGlobal,4).subscribe(()=>{
+      this.router.navigate(['/menu']).then(()=>this.orderService.filterAndOrganizeOrders(this.tableNumberGlobal.toString()).subscribe(ordersMap=>{
+        this.store.dispatch(setCommands({orderDictionary:ordersMap}))
+        console.log("order",ordersMap)
+      }));
 
-    this.router.navigate(['/menu']);
+    })
   }
 
   toggleSelection(table: any) {

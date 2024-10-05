@@ -9,7 +9,7 @@ import {Observable} from "rxjs";
 
 import { Store} from "@ngrx/store";
 import {selectCurrentClient} from "../../stores/command.selectors";
-import {OrderClient} from "../../interfaces/OrderClient";
+import {ClientPosition} from "../../interfaces/ClientPosition";
 import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {MatCardModule} from '@angular/material/card';
 import {filter, map} from "rxjs/operators";
@@ -35,7 +35,7 @@ import {filter, map} from "rxjs/operators";
 export class TableCategoriesComponent implements OnInit{
   private store=inject(Store)
 
-  currentClient$:Observable<OrderClient|null>=this.store.select(selectCurrentClient);
+  currentClient$:Observable<ClientPosition|null>=this.store.select(selectCurrentClient);
   commandNumber=-1
 
 
@@ -48,8 +48,8 @@ export class TableCategoriesComponent implements OnInit{
   ngOnInit(): void {
     this.currentClient$
       .pipe(
-        filter((client: OrderClient | null) => !!client),
-        map((client: OrderClient | null) => client?.commandNumber || -1)
+        filter((client: ClientPosition | null) => !!client),
+        map((client: ClientPosition | null) => client?.commandNumber || -1)
       )
       .subscribe((commandNumber: number) => {
        if(commandNumber&&commandNumber!==-1) this.commandNumber = commandNumber;

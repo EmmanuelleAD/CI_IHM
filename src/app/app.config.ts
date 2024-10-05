@@ -9,11 +9,12 @@ import {provideState, provideStore} from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import {commandReducer, commandsFeature} from "./stores/command.reducer";
 import { reservationFeature } from './components/table-reservation/reservation.reducer';
+import {submitOrderForClient$} from "./stores/command.effect";
 
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(),
-    provideHttpClient(), provideAnimationsAsync(), provideStore(),provideState(reservationFeature),provideState(commandsFeature), provideEffects(), provideAnimationsAsync()]
+    provideHttpClient(), provideAnimationsAsync(), provideStore(),provideState(reservationFeature),provideState(commandsFeature), provideEffects({submitOrderForClient$}), provideAnimationsAsync()]
 };

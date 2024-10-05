@@ -1,7 +1,7 @@
 import {Command} from "../interfaces/Command";
 import {createFeature, createReducer, on} from "@ngrx/store";
 import * as CommandActions from './command.action'
-import {OrderClient} from "../interfaces/OrderClient";
+import {ClientPosition} from "../interfaces/ClientPosition";
 import {finishToCommandForClient, getCurrentClient} from "./command.action";
 import {state} from "@angular/animations";
 import {ClientDto, TableDto} from "../components/table-reservation/table-reservation.component";
@@ -9,7 +9,7 @@ import {Table} from "../interfaces/Table";
 import {Client} from "../interfaces/Client";
 export interface CommandState {
   commands:Command[];
-  currentClient:OrderClient|null;
+  currentClient:ClientPosition|null;
 
 }
 
@@ -30,6 +30,7 @@ const initialState:CommandState={
             items: [
 
             ]
+            ,orderId:"13333"
           },
           {
             client: "2",
@@ -37,8 +38,10 @@ const initialState:CommandState={
             clientOrdered:false,
             items: [
 
-            ]
-          },
+            ],
+          orderId:"13333"
+
+},
           {
             client: "3",
             clientPaid: false,
@@ -46,13 +49,17 @@ const initialState:CommandState={
             items: [
 
             ]
-          }, {
+            ,orderId:"13333"
+
+}, {
             client: "4",
             clientPaid: false,
             clientOrdered:false,
             items: [
 
             ]
+            ,orderId:"13333"
+
           }]
 
       }
@@ -68,7 +75,7 @@ export const commandReducer=createReducer(initialState,
       if(table){
        const client= table.clients.find(c=>!c.clientOrdered)
         if(client){
-          const currentClient:OrderClient={
+          const currentClient:ClientPosition={
             clientNumber:table.clients.indexOf(client)+1,
             tableNumber:table.tableNumber,
             commandNumber:command.commandId
@@ -246,25 +253,27 @@ export const commandReducer=createReducer(initialState,
     return state;
 
   }),
-  on(CommandActions.setCommands, (state, { tablesToCreate }) => {
+  on(CommandActions.setCommands, (state, { orderDictionary }) => {
     const command = state.commands[0];  // On récupère la première commande
 console.log("a")
     if (command) {
-      console.log("h",tablesToCreate)
-      // Mappage des nouvelles tables reçues via `tables` (de type TableDto[])
-      const updatedTables :Table[]= tablesToCreate.tables.map((t: TableDto) => ({
-        table: String(t.tableNumber),
+      console.log("h",orderDictionary)
+      const updatedTables :Table[] = Object.values(orderDictionary).map((t:TableDto)=>({
+        table: `${command.commandId}${t.tableNumber}`,
         tableNumber:t.tableNumber,
-          tablePaid: false,              // Initialisation du paiement de la table
-          tableOrdered: false,
+        tablePaid: false,              // Initialisation du paiement de la table
+        tableOrdered: false,
         clients :t.clients.map((c: ClientDto) => ({
-          client: c.clientId,
-          clientOrdered: false,   // On initialise la commande du client à `false`
-          clientPaid: false,      // On initialise le paiement du client à `false`
-          items: [],              // Liste d'items vide
-        })
+            client: c.clientId,
+            clientOrdered: false,
+            clientPaid: false,
+          orderId:c.orderId,
+            items: [],
+          })
         )
-      }));
+      })
+      // Mappage des nouvelles tables reçues via `tables` (de type TableDto[])
+  );
       console.log(updatedTables)
 console.log("r")
       return {

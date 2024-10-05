@@ -1,14 +1,19 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {BehaviorSubject, concatMap, from, Observable} from 'rxjs';
 import { map } from 'rxjs/operators';
+import {OrderDictionary} from "./table-reservation/table-reservation.component";
+import {Item} from "../interfaces/Item";
+import {ItemBack} from "../interfaces/ItemBack";
+import {addItemForClient} from "../stores/command.action";
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
 
   private baseUrl = 'http://localhost:3001';  // URL du backend
+  public globalOrderPrefix:BehaviorSubject<string>=new BehaviorSubject("");
 
   constructor(private http: HttpClient) {}
 
@@ -41,7 +46,11 @@ export class OrderService {
     return this.http.post(`${this.baseUrl}/tableorder/${orderId}`, {});
   }
 
-  filterAndOrganizeOrders(globalOrderPrefix: string): Observable<any> {
+  filterAndOrganizeOrders(globalOrderPrefix: string): Observable<OrderDictionary> {
+    if(globalOrderPrefix==="")
+    {
+      globalOrderPrefix=this.globalOrderPrefix.value;
+    }
     console.log("fillll");
     return this.getTableOrder().pipe(
       map((orders) => {
@@ -69,7 +78,7 @@ export class OrderService {
           ordersMap[tableNumber].clients.push({
             clientId: clientNumber,
             orderId: order._id,  // Utiliser l'_id de la commande comme OrderId
-            clientPaid: order.billed ==null? false : true 
+            clientPaid: order.billed ==null? false : true
           });
         });
 
@@ -96,6 +105,22 @@ export class OrderService {
 
     localStorage.setItem('MappedOrders', JSON.stringify(ordersMap));
     console.log('Les commandes mappées ont été stockées dans le localStorage.');
+
+  }
+  public addItemForClient(orderId:string,item:Item):Observable<any>{
+    const payloadForBack:ItemBack={
+      menuItemId:item.itemId,
+      menuItemShortName:item.shortName,
+      howMany:item.quantity
+    }
+    return this.http.post(`${this.baseUrl}/tableOrders/${orderId}`, payloadForBack);
+  }
+  addItemsForClient(orderId:string,items:Item[]):Observable<any>{
+    return from(items).pipe(
+      concatMap(item=>
+        this.addItemForClient(orderId,item)
+      )
+    );
 
   }
 

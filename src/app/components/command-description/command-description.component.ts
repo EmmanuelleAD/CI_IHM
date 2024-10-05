@@ -4,7 +4,7 @@ import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} fr
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import {Store} from "@ngrx/store";
 import {Observable} from "rxjs";
-import {OrderClient} from "../../interfaces/OrderClient";
+import {ClientPosition} from "../../interfaces/ClientPosition";
 import {selectCurrentClient, selectTable} from "../../stores/command.selectors";
 import {Table} from "../../interfaces/Table";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
