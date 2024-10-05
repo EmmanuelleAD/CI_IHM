@@ -2,12 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Observable, take } from 'rxjs';
+import { filter, Observable, take } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { selectTable, unselectTable } from '../../components/table-reservation/reservation.actions'; 
 
 import { TableButtonComponent } from "../../shared/table/table.component";
 import { ReservationState } from "../table-reservation/reservation.reducer";
 import { clearSelectedTables } from "../table-reservation/reservation.actions";
+import {OrderService} from "../orderService";
+import { OrderManager } from '../OrderManager';
 
 @Component({
   standalone: true,
@@ -24,46 +27,93 @@ export class PaymentMethodComponent implements OnInit {
   tables: Array<any> = [];
   payTablesBill: Array<any> = [];
   tablesTotal: number = 0;
+  commandIdGlobal:string | null;
 
   payAll: boolean = false;
-  serverLink: string = 'http://localhost:3003/dining';
+  serverLink: string = 'http://localhost:3001/';
   showAlert = false;
   alertMessage: string = '';
+
+  ordersMap: { [key: string]: any } = {}; 
+  ordersMapTables: number[]= [];
 
   // Utilisation de readonly pour garantir que 'store' est injecté et ne change pas après
   constructor(
     private readonly route: ActivatedRoute,
     private readonly httpClient: HttpClient,
-    private readonly store: Store<{ reservation: ReservationState }>
+    private readonly store: Store<{ reservation: ReservationState }>,private orderService:OrderService
   ) {
-    // Initialisation de selectedTables$ après injection de store
     this.selectedTables$ = this.store.select(state => state.reservation.selectedTables);
+    this.commandIdGlobal = this.route.snapshot.paramMap.get('count');
+    console.log(this.commandIdGlobal);
+
+
   }
 
   ngOnInit(): void {
-    console.log('##### ON INIT');
-    this.route.params.pipe(take(1)).subscribe(params => {
-      const commandIdParam = params['commandId'];
-      this.commandId = commandIdParam ? Number(commandIdParam) : null;
-      if (this.commandId) {
-        this.loadClientsFromReservations(this.commandId);
-      }
-    });
-  }
+    this.orderService.filterAndOrganizeOrders(this.commandIdGlobal!).subscribe({
+      next: (ordersMap) => {
+        this.ordersMap = ordersMap;
+        this.ordersMapTables = Object.keys(ordersMap).map(key => parseInt(key, 10));
+        Object.keys(ordersMap).forEach(tableNumber => {
+          this.ordersMap[tableNumber]['tableTotal'] = 0;
+          this.ordersMap[tableNumber]['tablePaid'] = this.ordersMap[tableNumber]['clients'].every((client: any) => {
+            return client.clientPaid === true;
+          });
+          
+          this.ordersMap[tableNumber]['clients'].forEach((client: any) => {
+            // Get client order details
 
-  loadClientsFromReservations(commandId: number): void {
-    this.httpClient.get<any>(`${this.serverLink}/command/${commandId}/tables`).pipe(take(1)).subscribe({
-      next: (response: any) => {
-        this.tables = response.tables || [];
-        console.log(this.tables);
+            client["total"]=0 ;
+            this.httpClient.get(`${this.serverLink}tableOrders/${client.orderId}`).pipe(take(1)).subscribe({
+              next: (clientOrder: any) => {
+                client['order'] = clientOrder;
+                // Get details of each order line item
+                clientOrder.lines.forEach((item: any) => {
+                  this.httpClient.get(`http://localhost:3000/menus/${item["item"]["_id"]}`).pipe(take(1)).subscribe({
+                    next: (menuItem: any) => {
+                      client["total"]+=menuItem["price"]*item["howMany"];
+                    },
+                    error: (err) => {
+                      console.error(`Error fetching menu item ${item._id}:`, err);
+                    }
+                  });
+                });
+                this.ordersMap[tableNumber]['tableTotal'] += client["total"];
+
+              },
+              error: (err) => {
+                console.error(`Error fetching client order ${client.orderId}:`, err);
+              }
+            });
+          });
+        })
       },
-      error: (error: any) => {
-        console.error('Erreur lors de la récupération des tables:', error);
+      error: (err) => {
+        console.error('Error fetching orders:', err);
+      }
+    });
+  }
+  
+
+  loadClientsFromReservations(): void {
+    console.log("order Map ", this.ordersMap);
+  }
+  toggleTableSelection(tableNumber: number) {
+    this.selectedTables$.pipe(take(1)).subscribe(selectedTables => {
+      if (selectedTables.includes(tableNumber)) {
+        this.store.dispatch(unselectTable({ tableNumber }));
+      } else {
+        this.store.dispatch(selectTable({ tableNumber }));
       }
     });
   }
 
-  selectTable(table: number, tablePaid: boolean): void {
+
+  selectTable(table: number, tablePaid: boolean, tableObj:boolean): void {
+    console.log("selecting table to pay");
+    console.log(tablePaid);
+    console.log(tableObj);
     if (tablePaid) {
       this.triggerAlert('Table déjà payée');
     } else {
@@ -91,23 +141,21 @@ export class PaymentMethodComponent implements OnInit {
   }
 
   choosePaymentMethod(method: 'whole' | 'individual' | 'multipleTables'): void {
-    // Redirection ou gestion du mode de paiement
+    //Redirection ou gestion du mode de paiement
   }
 
   calculateTotal(selectedTables: number[]): void {
-    this.httpClient.post(`${this.serverLink}/payment/byTable`, {
-      commandId: this.commandId,
-      selectedTables
-    }).pipe(take(1)).subscribe({
-      next: (response: any) => {
-        console.log(response);
-        this.payTablesBill = response.tablesBill || [];
-        this.tablesTotal = response.commandTotal || 0;
-      },
-      error: (error) => {
-        console.log('Erreur lors du calcul du total:', error);
-      }
-    });
+    this.payTablesBill = [];
+    selectedTables.forEach(tableNumber => {
+      const tableBill :any = {}
+      tableBill['tableTotal'] = this.ordersMap[tableNumber]["tableTotal"];
+      tableBill['tableNumber'] = tableNumber;
+      this.tablesTotal += tableBill['tableTotal'];
+      tableBill['clients'] = this.ordersMap[tableNumber]["clients"];
+      this.payTablesBill .push(tableBill)
+      
+
+    })
   }
 
   processPayment(): void {
@@ -115,20 +163,21 @@ export class PaymentMethodComponent implements OnInit {
     this.selectedTables$.pipe(take(1)).subscribe({
       next: (selectedTables) => {
         console.log('Tables sélectionnées:', selectedTables);
-        this.httpClient.post(`${this.serverLink}/payment/process/byTables`, {
-          commandId: this.commandId,
-          paidTables: selectedTables
-        }).subscribe({
-          next: (response) => {
-            console.log('Paiement traité avec succès:', response);
-            this.store.dispatch(clearSelectedTables());
-            this.ngOnInit();
-          },
-          error: (error) => this.logError(error)
+        selectedTables.forEach(selectedTable =>{
+          this.ordersMap[selectedTable]['clients'].forEach((client:any) => {
+            this.httpClient.post(`${this.serverLink}tableOrders/${client['orderId']}/bill`,{}).subscribe({
+              next: (response) => {        
+                this.ngOnInit();
+              },
+              error: (error) => this.logError(error)
+            });
+            
+          });
         });
       },
       error: (error) => this.logError(error)
     });
+
   }
 
   triggerAlert(alertMessage: string): void {

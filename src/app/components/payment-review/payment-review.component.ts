@@ -26,7 +26,6 @@ export class PaymentReviewComponent implements OnInit {
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: any
   ) {
-    // Vérifier si le code est exécuté côté navigateur
     if (isPlatformBrowser(this.platformId) && typeof window !== 'undefined' && window.localStorage) {
       this.storage = window.localStorage;
     } else {
@@ -38,19 +37,19 @@ export class PaymentReviewComponent implements OnInit {
       this.tableNumber = +params['tableNumber'];
       this.commandId = +params['orderId'];
       console.log("Table Number from URL:", this.tableNumber);
-      this.loadCommandFromFile();  // Charger les données JSON depuis le serveur
+      this.loadCommandFromStorage();  // Charger les données depuis le localStorage
     });
   }
 
   ngOnInit() {
     // Écouter les changements dans le localStorage depuis d'autres onglets/bornes
     window.addEventListener('storage', (event) => {
-      if (event.key === 'Command') {
+      if (event.key === 'commands') {
         const updatedCommands = JSON.parse(event.newValue || '[]');
         console.log('Commande mise à jour depuis une autre borne :', updatedCommands);
 
         // Mettre à jour l'état local avec la nouvelle commande si elle correspond à l'ID en cours
-        const command = updatedCommands.find((cmd: any) => cmd.commandId === this.commandId);
+        const command = updatedCommands.find((cmd: any) => cmd.commandId === this.commandId?.toString())
         if (command) {
           this.command = command;
           this.selectedTable = this.command.tables.find((table: any) => +table.tableNumber === this.tableNumber);
@@ -59,33 +58,29 @@ export class PaymentReviewComponent implements OnInit {
       }
     });
   }
+  loadCommandFromStorage() {
+    const storedCommands = JSON.parse(this.storage?.getItem("commands") || '[]');
+    console.log('Stored Commands:', storedCommands);
+    console.log('Stored Commands 22:',this.commandId);
 
-  // Charger les données JSON depuis le fichier local
-  loadCommandFromFile() {
-    const jsonFilePath = 'assets/Commands.json';  // Chemin du fichier JSON
+    this.command = storedCommands.find((cmd: any) => cmd.commandId === this.commandId?.toString());
 
-    this.http.get<any>(jsonFilePath).subscribe(
-      data => {
-        this.command = data.find((cmd: any) => cmd.commandId === this.commandId);
-        console.log('Command after loading from file:', this.command);
-
-        if (this.command) {
-          this.selectedTable = this.command.tables.find((table: any) => +table.tableNumber === this.tableNumber);
-          if (!this.selectedTable) {
-            console.error("Table non trouvée pour le numéro :", this.tableNumber);
-          }
-        } else {
-          console.error("Commande non trouvée pour l'ID :", this.commandId);
-        }
-      },
-      error => {
-        console.error('Erreur lors du chargement du fichier JSON', error);
+    if (this.command) {
+      console.log('Command found:', this.command);
+      this.selectedTable = this.command.tables.find((table: any) => +table.tableNumber === this.tableNumber);
+      if (!this.selectedTable) {
+        console.error("Table not found for number:", this.tableNumber);
       }
-    );
+    } else {
+      console.error("Command not found for ID:", this.commandId);
+    }
   }
 
-  // Calculer le total pour un client donné
+
   calculateClientTotal(client: any): number {
+    if (!client.items || client.items.length === 0) {
+      return 0;
+    }
     return client.items.reduce((sum: number, item: any) => sum + (item.quantity * item.price), 0);
   }
 

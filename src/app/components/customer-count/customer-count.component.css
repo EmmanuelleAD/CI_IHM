@@ -30,8 +30,8 @@ button.mat-raised-button {
   justify-content: center;
 
   mat-icon {
-    font-size: 24px;  // Ajuste la taille de l'icône
-    margin-right: 8px;  // Espace entre l'icône et le texte si nécessaire
+    font-size: 24px;
+  margin-right: 8px;
   }
 }
 
@@ -51,6 +51,8 @@ h2 {
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
+  padding-top: 20px ;
+
 }
 
 .decrement, .increment {

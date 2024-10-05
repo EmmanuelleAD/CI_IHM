@@ -1,6 +1,6 @@
 import { Component, Input  } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { selectTable, unselectTable } from '../../components/table-reservation/reservation.actions'; 
+import { selectTable,unselectTable } from 'src/app/components/table-reservation/reservation.actions';
 import { ReservationState } from '../../components/table-reservation/reservation.reducer'; 
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -20,11 +20,11 @@ export class TableButtonComponent {
   @Input() disabled: boolean = false; // Default to false if not provided
   selectedTables$: Observable<number[]>;
   
-  constructor(private store: Store<{ reservation: ReservationState }>) { 
+  constructor(private readonly store: Store<{ reservation: ReservationState }>) { 
     this.selectedTables$ = this.store.select(state => state.reservation.selectedTables);
   }
 
-  // Toggle the selection of a table with only one subscription
+  //Toggle the selection of a table with only one subscription
   toggleTableSelection(tableNumber: number) {
     this.selectedTables$.pipe(take(1)).subscribe(selectedTables => {
       if (selectedTables.includes(tableNumber)) {
@@ -35,7 +35,7 @@ export class TableButtonComponent {
     });
   }
 
-  // Method to check if a table is selected
+  // // Method to check if a table is selected
   isSelected(tableNumber: number): boolean {
     let isSelected = false;
     this.selectedTables$.pipe(take(1)).subscribe(selectedTables => {
