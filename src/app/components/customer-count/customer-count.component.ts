@@ -118,7 +118,11 @@ export class CustomerCountComponent {
     }
     else{
       this.router.navigate(['/payment-method', this.count]).then(()=>this.orderService.filterAndOrganizeOrders(this.count).subscribe(ordersMap=>{
-        this.store.dispatch(setCommands({orderDictionary:ordersMap}))
+        this.store.dispatch(setCommands({
+          orderDictionary: ordersMap,
+          commandNumber: Number(this.count)
+        }));
+
         console.log("order",ordersMap)
       }));
     }
