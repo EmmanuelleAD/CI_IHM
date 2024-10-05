@@ -91,7 +91,7 @@ export class TableReservationComponent implements OnInit{
     this.http.get<Table[]>(this.backendUrl).subscribe({
       next: (response: Table[]) => {
         this.tables = response
-          .filter(table => table.number < 100&&!table.taken)
+          .filter(table => table.number < 100)
           .map((table, index) => ({
             ...table,
             positionX: (index % 5) * 120,
