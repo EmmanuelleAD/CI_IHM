@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #fdfdcc;
+  background-color: #fdcd4c;
   padding: 20px;
   height: 100vh;
   justify-content: center;
@@ -14,13 +14,14 @@
   align-items: center;
   flex-direction: column;
   padding: 20px;
-  background-color: #f0f0f0;
+  background-color:  #46cd6d !important;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
   text-align: center;
+  color: white;
 }
 
 
@@ -30,8 +31,8 @@ button.mat-raised-button {
   justify-content: center;
 
   mat-icon {
-    font-size: 24px;
-  margin-right: 8px;
+    font-size: 24px;  // Ajuste la taille de l'icône
+  margin-right: 8px;  // Espace entre l'icône et le texte si nécessaire
   }
 }
 
@@ -50,9 +51,7 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
-  padding-top: 20px ;
-
+  height: fit-content;
 }
 
 .decrement, .increment {
@@ -61,11 +60,15 @@ h2 {
   border: none;
   padding: 10px;
   cursor: pointer;
+  color: white;
 }
 
 .count-display {
   font-size: 50px;
   margin: 0 20px;
+  height: fit-content;
+  padding: 20px;
+  color: white;
 }
 
 .number-pad {
@@ -77,12 +80,13 @@ h2 {
 .number-pad button {
   font-size: 24px;
   padding: 20px;
-  background-color: white;
+  background-color:  #46cd6d !important;
   border: 1px solid #ccc;
   cursor: pointer;
   border-radius: 8px;
+  color: white;
 }
 
 .number-pad button:hover {
-  background-color: #f0f0f0;
+  background-color: #3bb45b !important;
 }

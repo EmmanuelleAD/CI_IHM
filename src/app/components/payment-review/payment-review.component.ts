@@ -152,4 +152,7 @@ export class PaymentReviewComponent implements OnInit {
     }
     return 'default';  // Gris par défaut
   }
+  takeMeHome(){
+  //  this.route.navigate(['/home']);
+  }
 }

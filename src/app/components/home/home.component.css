@@ -1,15 +1,63 @@
-
-.home-card {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%; /* Assure-toi que la carte a une hauteur définie */
-  width:400px;
-  height: 600px;
+.order {
+  background-color:  #f05d35 !important;
+  bottom: 70px; /* Distance from the bottom of the page */
 }
-.container{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 30px;
+.order:hover {
+  background-color: #e0522e !important;
+}
+.pay {
+  background-color:  #46cd6d !important;
+  bottom: 20px; /* Distance from the bottom of the page */
+}
+
+.pay:hover {
+  background-color: #3bb45b !important;
+}
+.order, .pay{
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  width: 90%;
+  border-radius: 10px;
+  height: 40px;
+}
+
+h1 {
+  font-size: 2rem;
+  color: white;
+  text-align: center;
+}
+.home-container{
+  background-color: #fdcd4c;
+  width: 100%;
+  height: 100%;
+}
+.home-title {
+  text-align: center; /* Horizontally center text */
+  position: absolute;
+  top: 50px; /* Distance from the top of the page, adjust as needed */
+  left: 50%; /* Move to the center horizontally */
+  transform: translateX(-50%); /* Align with the center */
+  font-size: 20px; /* Font size for the title */
+  color: white;
+}
+.home-title-1{
+  text-align: center; /* Horizontally center text */
+  position: absolute;
+  top: 20px; /* Distance from the top of the page, adjust as needed */
+  left: 50%; /* Move to the center horizontally */
+  transform: translateX(-50%); /* Align with the center */
+  font-size: 20px; /* Font size for the title */
+  color: white;
+}
+.img-burger{
+  /*  width: 550px;
+    height: 683px;*/
+  max-width: 100%; /* Responsive image */
+  height: auto; /* Maintain aspect ratio */
 }

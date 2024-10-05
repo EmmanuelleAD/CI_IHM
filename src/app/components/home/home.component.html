@@ -1,13 +1,20 @@
+<!--
 <div class="container">
-    <mat-card class="home-card" appearance="outlined">
-        <mat-card-content>
-            <button
-                    class="start-button"
-                    mat-raised-button
-                    disabledInteractive
-                    (click)="navigateToNextPage()"
-                   >Click here to Start</button></mat-card-content>
+  <div class="section order" (click)="navigateToReservation()">
+    <h1>Click Here to Order</h1>
+  </div>
 
-    </mat-card>
-
+  <div class="section pay" (click)="navigateToPayment()">
+    <h1>Click Here to Pay</h1>
+  </div>
+</div>
+-->
+<div class="home-container">
+  <h3 class="home-title-1">Polytech Fried Kitchen</h3>
+  <h3 class="home-title">Let's get started</h3>
+  <img class="img-burger" src="assets/cheeseburger-7580676_1280.jpg" >
+  <button mat-flat-button class="order" (click)="navigateToReservation()">Click here to Order</button>
+  <div>
+    <button mat-flat-button class="pay" (click)="navigateToPayment()">Click here to Pay</button>
+  </div>
 </div>
