@@ -194,4 +194,7 @@ export class PaymentMethodComponent implements OnInit {
     console.error('Erreur détectée:', error);
 
   }
+  GoHome(){
+    this.router.navigateByUrl('');
+  }
 }

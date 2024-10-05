@@ -83,6 +83,7 @@ h3 {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   text-align: center; /* Centrer le texte à l'intérieur de la table */
+  padding:20px 5px 20px 5px;
 }
 
 /* Table dans les détails de la commande */
@@ -139,12 +140,13 @@ h3 {
   font-size: 20px;
   font-weight: bold;
   color: white;
-  background-color: #007bff;
+  background-color: #5cb85c ;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s, transform 0.2s;
+
 }
 
 
@@ -156,3 +158,13 @@ h3 {
 
 
 
+.homeButton{
+  display: flex;
+  justify-content: center;
+}
+
+
+.homeButton .btn {
+  background-color: #5cb85c ; /* Or use btn-warning for Bootstrap yellow */
+  color: white;
+}

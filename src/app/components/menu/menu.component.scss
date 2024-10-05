@@ -1,45 +1,106 @@
 .menu-container {
-   /* display: flex;
-    flex-direction: column;
-    gap: 10px;*/
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: row;
   gap: 10px;
-  }
+}
 
-  .menu-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-  }
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-  .quantity-controls {
-    display: flex;
-    align-items: center;
-  }
+.quantity-controls {
+  display: flex;
+  align-items: center;
+}
 
-  .quantity-controls button {
-    width: 30px;
-    height: 30px;
-    font-size: 18px;
-    margin: 0 10px;
-    cursor: pointer;
-  }
-  .copyButton{
-    background-color: #0c1f27 !important;;
-    color: white !important;;
-  }
-  .finishOrder{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50%;
-  }
-  .finishContent{
-    padding: 3em;
-    text-align: center;
-  }
-.title-center{
-  text-align: center;
+.quantity-controls button {
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.cart {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-items {
+  max-height: 100px; /* Limite la hauteur à environ trois lignes */
+  overflow: hidden; /* Cache l'excès de contenu */
+  position: relative;
+}
+
+.cart-items::after {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: white;
+  padding-left: 10px;
+  text-align: right;
+}
+
+.cart-item {
+  white-space: nowrap; /* Force le contenu à rester sur une ligne */
+  overflow: hidden; /* Cache les parties trop longues du texte */
+  text-overflow: ellipsis; /* Ajoute "..." si le texte dépasse */
+}
+
+.cart h2 {
+  margin-top: 0;
+}
+
+.cart button {
+  margin-left: 20px;
+  padding: 10px 20px;
+}
+
+
+header {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.example-container {
+  width: 100%;
+  height: 100%;
+  margin: 10px;
+
+  /* The background property is added to clearly distinguish the borders between drawer and main
+     content */
+  background: #eee;
+}
+.side-bar{
+  background-color:  white;
+  padding: 20px;
+}
+.side-bar-content{
+  background-color:  #46cd6d !important;
+  padding: 20px;
 }

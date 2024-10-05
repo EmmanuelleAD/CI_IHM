@@ -1,5 +1,5 @@
 <div *ngIf="ordersMapTables.length" class="container my-4">
-  
+
   <h1 class="mb-4 text-center">Command Number: {{ commandIdGlobal }}</h1>
 
   <h3 class="mb-3 text-center">Select Tables To Pay:</h3>
@@ -35,13 +35,13 @@
     <div class="accordion" id="accordionExample">
       <div *ngFor="let bill of payTablesBill; let i = index" class="accordion-item">
         <h2 class="accordion-header" [id]="'heading' + i">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-                  [attr.data-bs-target]="'#collapse' + i" aria-expanded="false" 
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  [attr.data-bs-target]="'#collapse' + i" aria-expanded="false"
                   [attr.aria-controls]="'collapse' + i">
             Table {{ bill.tableNumber }} Total: {{ bill.tableTotal | currency }}
           </button>
         </h2>
-        <div [id]="'collapse' + i" class="accordion-collapse collapse" 
+        <div [id]="'collapse' + i" class="accordion-collapse collapse"
              [attr.aria-labelledby]="'heading' + i" data-bs-parent="#accordionExample">
           <div class="accordion-body">
             <ul class="list-group">
@@ -53,9 +53,17 @@
         </div>
       </div>
     </div>
-    
+
     <button class="btn btn-success" (click)="processPayment()">Pay Now</button>
   </div>
 
-
 </div>
+<div *ngIf="!tables.length" class="container my-4" style="height: 100vh;" >
+  <h1>
+    Command not found
+  </h1>
+  <button type="btn" class="btn btn-primary pull-right" (click)="GoHome()">
+    Home
+  </button>
+</div>
+
