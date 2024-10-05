@@ -2,11 +2,8 @@ import {Command} from "../interfaces/Command";
 import {createFeature, createReducer, on} from "@ngrx/store";
 import * as CommandActions from './command.action'
 import {ClientPosition} from "../interfaces/ClientPosition";
-import {finishToCommandForClient, getCurrentClient} from "./command.action";
-import {state} from "@angular/animations";
 import {ClientDto, TableDto} from "../components/table-reservation/table-reservation.component";
 import {Table} from "../interfaces/Table";
-import {Client} from "../interfaces/Client";
 export interface CommandState {
   commands:Command[];
   currentClient:ClientPosition|null;
@@ -205,10 +202,50 @@ console.log(command)
     return state;
 
   }),
+  on(CommandActions.payForClient, (state, { tableNumber, clientNumber }) => {
+    const command = state.commands.at(0);
+
+    if (command) {
+      const table = command.tables.find(table => table.tableNumber === tableNumber);
+
+      if (table) {
+        const client = table.clients.at(clientNumber - 1);
+
+        if (client) {
+          const updatedClients = table.clients.map((c, cIndex) =>
+            cIndex === clientNumber - 1 ? { ...c, clientPaid: true } : c
+          );
+
+          const allClientsPaid = updatedClients.every(c => c.clientPaid);
+
+          return {
+            ...state,
+            commands: [
+              {
+                ...command,
+                tables: command.tables.map(t =>
+                  t.tableNumber === tableNumber
+                    ? {
+                      ...t,
+                      clients: updatedClients,
+                      tablePaid: allClientsPaid,
+                    }
+                    : t
+                ),
+              },
+            ],
+          };
+        }
+      }
+    }
+
+    return state;
+  }),
+
   on(CommandActions.setCommands, (state, { orderDictionary,commandNumber }) => {
-console.log("a")
-      console.log("h",orderDictionary)
-      const updatedTables :Table[] = Object.values(orderDictionary).map((t:TableDto)=>({
+    console.log("a")
+    console.log("h",orderDictionary)
+    const updatedTables :Table[] = Object.values(orderDictionary).map((t:TableDto)=>({
         table: `${commandNumber}${t.tableNumber}`,
         tableNumber:t.tableNumber,
         tablePaid: false,              // Initialisation du paiement de la table
@@ -217,24 +254,24 @@ console.log("a")
             client: c.clientId,
             clientOrdered: false,
             clientPaid: false,
-          orderId:c.orderId,
+            orderId:c.orderId,
             items: [],
           })
         )
       })
-  );
-      console.log(updatedTables)
-      return {
-        ...state,
-        currentClient:null,
-        commands: [
-          {
-            commandId:commandNumber,
-            tables: updatedTables  // Mise à jour des tables dans l'état
-          }
-        ],
+    );
+    console.log(updatedTables)
+    return {
+      ...state,
+      currentClient:null,
+      commands: [
+        {
+          commandId:commandNumber,
+          tables: updatedTables  // Mise à jour des tables dans l'état
+        }
+      ],
 
-      };
+    };
   })
 );
 

@@ -13,7 +13,7 @@ export const selectCommands = createSelector(selectCommandState,
 export const selectTable=(commandNumber: number,tableNumber:number)=>createSelector(selectCommands,
   (commands)=>{
   console.log(commandNumber,tableNumber)
-    console.log(commands)
+
 const command= commands.find(com=>com.commandId===commandNumber);
 if(command){
   console.log( command.tables.find(table=>table.tableNumber===tableNumber))

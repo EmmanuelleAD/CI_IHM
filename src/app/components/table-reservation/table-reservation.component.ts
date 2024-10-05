@@ -8,11 +8,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import {TableService} from "../table.service";
-import {toObservable} from "@angular/core/rxjs-interop";
-import {OrderManagerCopyService} from "../order-manager-copy.service";
 import {Store} from "@ngrx/store";
-import {addItemForClient, setCommands} from "../../stores/command.action";
-import {BehaviorSubject, forkJoin, Observable, of, switchMap, tap} from "rxjs";
+import { setCommands} from "../../stores/command.action";
+import { forkJoin, Observable, of, switchMap, tap} from "rxjs";
 import {OrderService} from "../orderService";
 import {map} from "rxjs/operators";
 
@@ -73,9 +71,7 @@ export class TableReservationComponent implements OnInit{
   numberOfTables: number = 0;
   selectedCount: number = 0;
   tableNumberGlobal: number = 0;  // Variable to store the global table number
-  ordersMap: OrderDictionary = {};
-  a$:BehaviorSubject<TablesDto|null>
-=new BehaviorSubject<TablesDto|null>( null);
+
   private store=inject(Store);
   constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router,private  serviceTable:TableService,private  orderService:OrderService) { }
 
