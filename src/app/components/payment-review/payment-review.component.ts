@@ -49,7 +49,7 @@ export class PaymentReviewComponent implements OnInit {
   ngOnInit() {
     this.command$.subscribe(command => {
       if (command) {
-        this.selectedTable = command.tables.find((table: any) => +table.tableNumber === this.tableNumber);
+        this.selectedTable = command.tables.find((table: any) => table.tableNumber === this.tableNumber);
         console.log('Table mise à jour :', this.selectedTable);
       }
     });

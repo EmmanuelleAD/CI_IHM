@@ -11,13 +11,14 @@
 
 
 
-<ng-template #commandFinished>
+<ng-template #commandFinished >
   <div class="finishOrder">
-    <mat-card>
-      <mat-card-content class="finishContent">
-        <p>Order validated</p>
-        <p>Order Number:</p>
+    <mat-card class="finishContent">
+      <mat-card-content >
+        <h3>Order validated</h3>
+        <h3>Order Number:</h3>
         <h2>{{commandNumber}}</h2>
+        <button mat-button routerLink="/">Ok</button>
       </mat-card-content>
     </mat-card>
 
