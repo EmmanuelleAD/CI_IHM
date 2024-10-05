@@ -116,6 +116,7 @@ export class OrderService {
     return this.http.post(`${this.baseUrl}/tableOrders/${orderId}`, payloadForBack);
   }
   addItemsForClient(orderId:string,items:Item[]):Observable<any>{
+    console.log("ici",orderId,items)
     return from(items).pipe(
       concatMap(item=>
         this.addItemForClient(orderId,item)

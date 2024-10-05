@@ -14,7 +14,7 @@ import {
   removeItemForClient
 } from "../../stores/command.action";
 import {Item} from "../../interfaces/Item";
-import {Router} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {filter, map} from "rxjs/operators";
 import {MatDialog, MatDialogModule} from "@angular/material/dialog";
 import {CommandDescriptionComponent} from "../command-description/command-description.component";
@@ -25,7 +25,7 @@ import {OrderService} from "../orderService";
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, MenuItemComponent, HeaderComponent, MatDialogModule, MatButton, MatCard, MatCardHeader, MatCardContent, MatCardSubtitle, MatCardTitle],
+  imports: [CommonModule, MenuItemComponent, HeaderComponent, MatDialogModule, MatButton, MatCard, MatCardHeader, MatCardContent, MatCardSubtitle, MatCardTitle, RouterLink],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
@@ -145,7 +145,7 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
     console.log('Cart validated', this.cart);
     this.cart = [];
     localStorage.removeItem('cart');
-    this.store.dispatch(finishToCommandForClient({  tableNumber, clientNumber: clientIndex  }));
+    this.store.dispatch(finishToCommandForClient({  tableNumber:tableNumber, clientNumber: clientIndex  }));
     this.router.navigate(['/table-categories']);
   }
 

@@ -65,6 +65,16 @@ export const selectCurrentClientOrder=
       }
       return null;
     });
+export const selectClientOrder=(tableNumber:number,clientNumber:number)=>
+  createSelector(selectCommands,
+    (commands) => { console.log("com",commands)
+      if (commands&&commands.length > 0) {
+
+      const table= commands[0].tables.find(t=>t.tableNumber===tableNumber);
+      if(table)
+        return table.clients[clientNumber-1];
+    }
+  return null});
 export const selectIsTheFirstToCommand = (commandNumber: number, clientNumber: number)=>
   createSelector(
   selectCommands,

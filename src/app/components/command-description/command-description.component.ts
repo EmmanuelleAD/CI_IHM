@@ -11,7 +11,7 @@ import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {Item} from "../../interfaces/Item";
 import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 import {buildApplication} from "@angular-devkit/build-angular";
-import {copyCommandForCurrentClient, removeItemForClient} from "../../stores/command.action";
+import {copyCommandForCurrentClient, finishToCommandForClient, removeItemForClient} from "../../stores/command.action";
 import {MatButton} from "@angular/material/button";
 
 @Component({
@@ -56,6 +56,8 @@ close(): void {
   }
   copyTheCommand(){
     this.store.dispatch(copyCommandForCurrentClient({ otherClientIndex:this.copyIndex  }));
+    this.store.dispatch(finishToCommandForClient({  tableNumber:this.data.orderClient.tableNumber, clientNumber: this.data.orderClient.clientNumber  }));
+
     this.close();
 
   }
