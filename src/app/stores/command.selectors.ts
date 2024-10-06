@@ -12,11 +12,9 @@ export const selectCommands = createSelector(selectCommandState,
   (state:CommandState)=>state.commands)
 export const selectTable=(commandNumber: number,tableNumber:number)=>createSelector(selectCommands,
   (commands)=>{
-  console.log(commandNumber,tableNumber)
 
 const command= commands.find(com=>com.commandId===commandNumber);
 if(command){
-  console.log( command.tables.find(table=>table.tableNumber===tableNumber))
   return command.tables.find(table=>table.tableNumber===tableNumber)
 
 }
@@ -25,11 +23,10 @@ if(command){
   })
 export const selectCurrentClient=
   createSelector(selectCommands,
-    (commands) => { console.log("com",commands)
+    (commands) => {
       if (commands&&commands.length > 0) {
 
         const command = commands[0];
-        console.log("comma",commands[0])
         const table = command.tables.find(t => !t.tableOrdered);
         if (table) {
           const client = table.clients.find(c => !c.clientOrdered);
@@ -47,11 +44,10 @@ export const selectCurrentClient=
     });
 export const isTheLast=
   createSelector(selectCommands,
-    (commands) => { console.log("com",commands)
+    (commands) => {
       if (commands&&commands.length > 0) {
 
         const command = commands[0];
-        console.log("comma",commands[0])
         const table = command.tables.find(t => !t.tableOrdered);
         if (table) {
           const client = table.clients.find(c => !c.clientOrdered);
@@ -69,17 +65,16 @@ export const isTheLast=
     });
 export const selectCommandNumber=
   createSelector(selectCommands,
-    (commands) => { console.log("com",commands[0])
+    (commands) => {
       if (commands&&commands.length > 0) {
             return commands[0].commandId;
       }
-      console.log("pron",commands)
       return -1;
     });
 
 export const selectCurrentClientOrder=
   createSelector(selectCommands,
-    (commands) => { console.log("com",commands)
+    (commands) => {
       if (commands&&commands.length > 0) {
 
         const command = commands[0];
@@ -98,7 +93,7 @@ export const selectCurrentClientOrder=
     });
 export const selectClientOrder=(tableNumber:number,clientNumber:number)=>
   createSelector(selectCommands,
-    (commands) => { console.log("com",commands)
+    (commands) => {
       if (commands&&commands.length > 0) {
 
       const table= commands[0].tables.find(t=>t.tableNumber===tableNumber);

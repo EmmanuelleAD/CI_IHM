@@ -49,10 +49,8 @@ close(): void {
 
   openDetails(items: Item[],copyIndex:number) {
     this.isDetailsDisplayed=true;
-    console.log("display",this.isDetailsDisplayed)
     this.itemsToDisplay=items
     this.copyIndex=copyIndex;
-    console.log(items,"tt")
   }
   copyTheCommand(){
     this.store.dispatch(copyCommandForCurrentClient({ otherClientIndex:this.copyIndex  }));

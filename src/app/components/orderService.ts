@@ -51,7 +51,6 @@ export class OrderService {
     {
       globalOrderPrefix=this.globalOrderPrefix.value;
     }
-    console.log("fillll");
     return this.getTableOrder().pipe(
       map((orders) => {
         const filteredOrders = orders.filter((order: { tableNumber: { toString: () => string; }; }) => order.tableNumber.toString().startsWith(globalOrderPrefix) && order.tableNumber.toString().length > 3);
@@ -113,10 +112,11 @@ export class OrderService {
       menuItemShortName:item.shortName,
       howMany:item.quantity
     }
+    console.log("Ajout de l'item pour le client représenté par l'orderId",orderId,item)
     return this.http.post(`${this.baseUrl}/tableOrders/${orderId}`, payloadForBack);
   }
   addItemsForClient(orderId:string,items:Item[]):Observable<any>{
-    console.log("ici",orderId,items)
+
     return from(items).pipe(
       concatMap(item=>
         this.addItemForClient(orderId,item)

@@ -135,7 +135,6 @@ export const commandReducer=createReducer(initialState,
 
   on(CommandActions.finishToCommandForClient, (state, { tableNumber, clientNumber }) => {
     const command = state.commands.at(0);
-console.log(command)
     if (command) {
       const table = command.tables.find(table => table.tableNumber === tableNumber);
 
@@ -182,9 +181,7 @@ console.log(command)
         const otherClient=table.clients.at(otherClientIndex)
         if(client&&otherClient){
           const itemsForCurrent=otherClient.items
-          console.log("c'est le dernier",client,table.clients.length-1,table.clients.indexOf(client))
           const tableOrdered:boolean=table.clients.indexOf(client)===table.clients.length-1
-          console.log(tableOrdered)
         const updatedClients=table.clients.map(c=>c===client?{...c,items:[...itemsForCurrent],clientOrdered:true}:c);
           const updatedTables=command.tables.map(t=>t==table?{...t,clients:updatedClients,tableOrdered:tableOrdered}:t);
           return{
@@ -243,8 +240,6 @@ console.log(command)
   }),
 
   on(CommandActions.setCommands, (state, { orderDictionary,commandNumber }) => {
-    console.log("a")
-    console.log("h",orderDictionary)
     const updatedTables :Table[] = Object.values(orderDictionary).map((t:TableDto)=>({
         table: `${commandNumber}${t.tableNumber}`,
         tableNumber:t.tableNumber,
@@ -260,7 +255,6 @@ console.log(command)
         )
       })
     );
-    console.log(updatedTables)
     return {
       ...state,
       currentClient:null,

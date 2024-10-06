@@ -128,15 +128,18 @@ this.serviceTable.createTableOrder(t.number,1).subscribe();
         // Pousse les observables pour `createTable` et `createTableOrder`
         const observable = this.serviceTable.createTable(commandIdForClient).pipe(
           switchMap((tableResponse) => {
-            console.log(`Table créée avec succès: ${commandIdForClient}`, tableResponse);
+            console.log(`Table créée avec succès pour le client : ${commandIdForClient}`, tableResponse);
 
             // Une fois la table créée, on crée une commande pour cette table
             return this.serviceTable.createTableOrder(commandIdForClient, 1).pipe(
-              map(clientResponse => ({
-                tableNumber: t.number,
-                clientId: clientNumber,
-                orderId: clientResponse._id
-              }))
+              map(clientResponse => {
+                console.log('Commande client créé  avec succès:', clientResponse._id,clientResponse);
+                return {
+                  tableNumber: t.number,
+                  clientId: clientNumber,
+                  orderId: clientResponse._id
+                };
+              })
             );
           })
         );

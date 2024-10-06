@@ -115,15 +115,12 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
   }
 
   loadCart() {
-    console.log("hello")
     const storedCart = localStorage.getItem('cart');
-    console.log(storedCart)
     if (storedCart) {
       this.cart = JSON.parse(storedCart);
     }
   }
   initializeCart() {
-    console.log("hello")
  this.updateLocalStorage()
     }
 
@@ -134,7 +131,6 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
 
 
   updateCart(item: MenuItem) {
-    console.log("updateCart")
     const existingItem = this.cart.find(i => i._id === item._id);
     if (item.quantity > 0) {
       if (existingItem) {
@@ -171,7 +167,6 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
 
 
   onCartClick(): void {
-    console.log('Cart clicked!');
 
   }
 

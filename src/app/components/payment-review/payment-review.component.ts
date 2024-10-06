@@ -70,7 +70,7 @@ export class PaymentReviewComponent implements OnInit {
             console.log(`Récupération des détails de la commande pour le client avec orderId : ${client.orderId}`);
             this.http.get(`http://localhost:3001/tableOrders/${client.orderId}`).subscribe({
               next: (orderDetails: any) => {
-                console.log(`Détails de la commande reçus pour le client ${client.clientId}`, orderDetails);
+                console.log(`Détails de la commande reçus pour le client `, orderDetails);
 
                 client.items = []; // Initialiser les items pour le client
                 client.total = 0;  // Initialiser le total pour le client
@@ -91,7 +91,7 @@ export class PaymentReviewComponent implements OnInit {
 
                       // Ajouter au total du client
                       client.total += (menuItem.price || 0) * item.howMany;
-                      console.log(`Total actuel pour le client ${client.clientId} :`, client.total);
+                      console.log(`Total actuel pour le client :`, client.total);
                     },
                     error: (error) => {
                       console.error(`Erreur lors de la récupération du prix pour l'item ${item.item._id}`, error);
@@ -138,7 +138,7 @@ export class PaymentReviewComponent implements OnInit {
     // Vérifie et traite le paiement pour chaque client sélectionné
     this.selectedClients.forEach(client => {
       const clientNumber = this.selectedTable.clients.indexOf(client) + 1;
-      console.log(`Paiement pour le client ${client.clientId}, clientNumber: ${clientNumber}`);
+      console.log(`Paiement pour le client, clientNumber: ${clientNumber}`);
 
       // Marquer le client comme payé localement
       client.clientPaid = true;

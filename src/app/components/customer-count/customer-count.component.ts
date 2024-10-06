@@ -94,8 +94,6 @@ export class CustomerCountComponent {
   }
 
   validateButton() {
-    console.log("typesss");
-    console.log(this.type);
 
     // Vérifie si le type est 'customerCount'
     if (this.type == "customerCount") {
@@ -136,7 +134,6 @@ export class CustomerCountComponent {
               commandNumber: Number(this.count)
             }));
 
-            console.log("order", ordersMap);
           });
         });
     }
