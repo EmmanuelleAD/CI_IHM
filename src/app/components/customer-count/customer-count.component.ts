@@ -91,43 +91,56 @@ export class CustomerCountComponent {
     } while (this.existingTableNumbers.includes(tableNumber));  // Vérifie si le numéro existe déjà
     return tableNumber;
   }
+
   validateButton() {
     console.log("typesss");
     console.log(this.type);
-    if (this.type == "customerCount") {
-      this.requiredNumberOfTables=Math.ceil(parseInt(this.count, 10) / 4);
-      if(this.requiredNumberOfTables>this.countEmptyTables){
-        console.log("too many clients");
-        this.openSnackBar("There is not enough available tables,please wait!");
-      }
-      else{
-        const customersCount = parseInt(this.count);  // Récupère le nombre de clients sous forme numérique
 
+    // Vérifie si le type est 'customerCount'
+    if (this.type == "customerCount") {
+      // Calcule le nombre de tables requis
+      this.requiredNumberOfTables = Math.ceil(parseInt(this.count, 10) / 4);
+
+      // Vérifie si le nombre de tables disponibles est suffisant
+      if (this.requiredNumberOfTables > this.countEmptyTables) {
+        console.log("too many clients");
+        this.openSnackBar("There is not enough available tables, please wait!");
+      } else {
+        const customersCount = parseInt(this.count); // Récupère le nombre de clients sous forme numérique
+
+        // Appelle le service pour récupérer toutes les tables
         this.tableService.getAllTables().subscribe(tables => {
           // Stocke tous les numéros de tables existants
           this.existingTableNumbers = tables.map((table: any) => table.number);
 
-
+          // Génère un numéro de table unique
           this.tableNumber = this.generateUniqueTableNumber();
 
-          // Crée ensuite la table
+          // Crée la table
           this.createTable(this.tableNumber, customersCount);
-          this.router.navigate(['/table-reservation', this.count,this.tableNumber]);
+
+          // Redirige vers la page de réservation de table
+          this.router.navigate(['/table-reservation', this.count, this.tableNumber]);
         });
       }
     }
-    else{
-      this.router.navigate(['/payment-method', this.count]).then(()=>this.orderService.filterAndOrganizeOrders(this.count).subscribe(ordersMap=>{
-        this.store.dispatch(setCommands({
-          orderDictionary: ordersMap,
-          commandNumber: Number(this.count)
-        }));
+    // Si le type n'est pas 'customerCount', on suppose que c'est un paiement
+    else {
+      this.router.navigate(['/payment-method', this.count])
+        .then(() => {
+          // Organise les commandes en filtrant selon le nombre de clients
+          this.orderService.filterAndOrganizeOrders(this.count).subscribe(ordersMap => {
+            this.store.dispatch(setCommands({
+              orderDictionary: ordersMap,
+              commandNumber: Number(this.count)
+            }));
 
-        console.log("order",ordersMap)
-      }));
+            console.log("order", ordersMap);
+          });
+        });
     }
-
   }
+
 
   // Crée la table et l'ordre global
   createTable(tableNumber: string, customersCount: number) {
