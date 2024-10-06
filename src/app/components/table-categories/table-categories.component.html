@@ -1,23 +1,27 @@
 
 <div *ngIf="currentClient$|async as currentClient; else commandFinished">
-  <h4 class="title-center"> Table{{currentClient.tableNumber}}</h4>
-  <h4 class="title-center">P{{currentClient.clientNumber}}</h4>
-  <div class="categories">
-    <app-category *ngFor="let  category of categories" [title]="category.title" [imageLink]="category.path" class="category"  routerLink="/menu">
+  <h4 class="title-center"> Table {{currentClient.tableNumber}}</h4>
+  <h4 class="title-center">P {{currentClient.clientNumber}}</h4>
+  <div class="categories row justify-content-center">
+    <div class="col-md-6 col-sm-6 mb-4" *ngFor="let  category of categories" >
+      <app-category  [title]="category.title" [imageLink]="category.path" class="category"  routerLink="/menu">
 
-    </app-category>
+      </app-category>
+    </div>
+
   </div>
 </div>
 
 
 
-<ng-template #commandFinished>
+<ng-template #commandFinished >
   <div class="finishOrder">
-    <mat-card>
-      <mat-card-content class="finishContent">
-        <p>Order validated</p>
-        <p>Order Number:</p>
+    <mat-card class="finishContent">
+      <mat-card-content >
+        <h3>Order validated</h3>
+        <h3>Order Number:</h3>
         <h2>{{commandNumber}}</h2>
+        <button mat-button routerLink="/">Ok</button>
       </mat-card-content>
     </mat-card>
 

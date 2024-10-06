@@ -45,6 +45,37 @@ export const selectCurrentClient=
       }
       return null;
     });
+export const isTheLast=
+  createSelector(selectCommands,
+    (commands) => { console.log("com",commands)
+      if (commands&&commands.length > 0) {
+
+        const command = commands[0];
+        console.log("comma",commands[0])
+        const table = command.tables.find(t => !t.tableOrdered);
+        if (table) {
+          const client = table.clients.find(c => !c.clientOrdered);
+          if (client) {
+            const currentClient: ClientPosition = {
+              clientNumber: table.clients.indexOf(client) + 1,
+              tableNumber: table.tableNumber,
+              commandNumber: command.commandId
+            };
+            return currentClient;
+          }
+        }
+      }
+      return null;
+    });
+export const selectCommandNumber=
+  createSelector(selectCommands,
+    (commands) => { console.log("com",commands[0])
+      if (commands&&commands.length > 0) {
+            return commands[0].commandId;
+      }
+      console.log("pron",commands)
+      return -1;
+    });
 
 export const selectCurrentClientOrder=
   createSelector(selectCommands,

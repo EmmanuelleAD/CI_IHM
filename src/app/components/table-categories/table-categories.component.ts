@@ -8,27 +8,28 @@ import {RouterLink} from "@angular/router";
 import {Observable} from "rxjs";
 
 import { Store} from "@ngrx/store";
-import {selectCurrentClient} from "../../stores/command.selectors";
+import {selectCommandNumber, selectCurrentClient} from "../../stores/command.selectors";
 import {ClientPosition} from "../../interfaces/ClientPosition";
 import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {MatCardModule} from '@angular/material/card';
 import {filter, map} from "rxjs/operators";
+import {MatButton} from "@angular/material/button";
 
 @Component({
   selector: 'app-table-categories',
   standalone: true,
-    imports: [
-        CategoryComponent,
-        NgForOf,
-        HeaderComponent,
-        RouterLink,
-        AsyncPipe,
-        NgIf,
-        JsonPipe,
-        MatCard,
-        MatCardContent,
-        MatCardHeader,MatCardModule
-    ],
+  imports: [
+    CategoryComponent,
+    NgForOf,
+    HeaderComponent,
+    RouterLink,
+    AsyncPipe,
+    NgIf,
+    JsonPipe,
+    MatCard,
+    MatCardContent,
+    MatCardHeader, MatCardModule, MatButton
+  ],
   templateUrl: './table-categories.component.html',
   styleUrl: './table-categories.component.scss'
 })
@@ -36,24 +37,17 @@ export class TableCategoriesComponent implements OnInit{
   private store=inject(Store)
 
   currentClient$:Observable<ClientPosition|null>=this.store.select(selectCurrentClient);
-  commandNumber=-1
-
+  commandNumber$:Observable<number>=this.store.select(selectCommandNumber);
+  commandNumber:number=-1
 
   public  categories:Category[]=CATEGORIES
   constructor() {
 
-    console.log(this.categories)
   }
 
   ngOnInit(): void {
-    this.currentClient$
-      .pipe(
-        filter((client: ClientPosition | null) => !!client),
-        map((client: ClientPosition | null) => client?.commandNumber || -1)
-      )
-      .subscribe((commandNumber: number) => {
-       if(commandNumber&&commandNumber!==-1) this.commandNumber = commandNumber;
-      });
+    this.commandNumber$.subscribe(cmdNumber=>this.commandNumber=cmdNumber)
+
   }
 
 

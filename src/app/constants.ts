@@ -21,7 +21,7 @@ export const CATEGORIES:Category[]=[
   },
   {
     title:"Desserts",
-    path:"https://img.freepik.com/photos-gratuite/mini-shortcake-aux-fraises-mignon-rose_53876-106073.jpg?t=st=1727530530~exp=1727534130~hmac=c470a0664a4cea4b51a3a9a90726eaedb65770dafde341386bbaaa9c5803dab2&w=826",
+    path:"https://s3.amazonaws.com/gmi-digital-library/d4b45de8-1878-4deb-ae0e-a69807c42f2b.jpg",
     type:"DESSERT"
   },
 

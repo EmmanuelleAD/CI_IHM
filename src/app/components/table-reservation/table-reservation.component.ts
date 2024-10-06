@@ -91,7 +91,7 @@ export class TableReservationComponent implements OnInit{
     this.http.get<Table[]>(this.backendUrl).subscribe({
       next: (response: Table[]) => {
         this.tables = response
-          .filter(table => table.number < 100&&!table.taken)
+          .filter(table => table.number < 100)
           .map((table, index) => ({
             ...table,
             positionX: (index % 5) * 120,
@@ -152,7 +152,7 @@ this.serviceTable.createTableOrder(t.number,1).subscribe();
 
   navigateToNextPage() {
     this.repartirClientsSurTables(this.numberOfCustomers,this.tableNumberGlobal,4).subscribe(()=>{
-      this.router.navigate(['/menu']).then(()=>this.orderService.filterAndOrganizeOrders(this.tableNumberGlobal.toString()).subscribe(ordersMap=>{
+      this.router.navigate(['/table-categories']).then(()=>this.orderService.filterAndOrganizeOrders(this.tableNumberGlobal.toString()).subscribe(ordersMap=>{
         this.store.dispatch(setCommands({orderDictionary:ordersMap,commandNumber:this.tableNumberGlobal}))
         console.log("order",ordersMap)
       }));

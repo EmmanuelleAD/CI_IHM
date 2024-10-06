@@ -4,11 +4,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
+import {NgOptimizedImage} from "@angular/common";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule, ButtonModule, ImageModule],
+  imports: [MatCardModule, MatButtonModule, ButtonModule, ImageModule, NgOptimizedImage],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })

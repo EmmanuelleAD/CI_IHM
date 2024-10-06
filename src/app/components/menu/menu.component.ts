@@ -7,7 +7,7 @@ import {HeaderComponent} from "../header/header.component";
 import {Store} from "@ngrx/store";
 import {Observable, of, switchMap} from "rxjs";
 import {ClientPosition} from "../../interfaces/ClientPosition";
-import {selectCurrentClient, selectIsTheFirstToCommand} from "../../stores/command.selectors";
+import {selectCommandNumber, selectCurrentClient, selectIsTheFirstToCommand} from "../../stores/command.selectors";
 import {
   addItemForClient,
   finishToCommandForClient,
@@ -15,7 +15,7 @@ import {
 } from "../../stores/command.action";
 import {Item} from "../../interfaces/Item";
 import {Router, RouterLink} from "@angular/router";
-import {filter, map} from "rxjs/operators";
+import {filter, map, take} from "rxjs/operators";
 import {MatDialog, MatDialogModule} from "@angular/material/dialog";
 import {CommandDescriptionComponent} from "../command-description/command-description.component";
 import {MatButton} from "@angular/material/button";
@@ -33,15 +33,14 @@ export class MenuComponent implements OnInit{
   items: MenuItem[] = [];
   cart: MenuItem[] = [];
   private store=inject(Store);
-  commandNumber:number|null=null;
   currentClient$:Observable<ClientPosition|null>=this.store.select(selectCurrentClient).pipe( );
-  commandNumber$:Observable<number>=new Observable();
+  commandNumber$:Observable<number>=this.store.select(selectCommandNumber);
+  commandNumber:number=-1;
   isTheFirst$?: Observable<boolean>=
   this.currentClient$.pipe(
     filter((client: ClientPosition | null) => !!client),
   map((client: ClientPosition | null) => {
   if (client) {
-    this.commandNumber=client.commandNumber
     return this.store.select(selectIsTheFirstToCommand(client.commandNumber, client.clientNumber));
   }
   return of(true);
@@ -63,6 +62,7 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
       });
     }
   )
+    this.commandNumber$.subscribe(cmdNumber=>this.commandNumber=cmdNumber)
     this.loadCart();
   }
 
@@ -142,11 +142,14 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
   }
 
   validateCart(tableNumber:number, clientIndex:number) {
-    console.log('Cart validated', this.cart);
-    this.cart = [];
-    localStorage.removeItem('cart');
-    this.store.dispatch(finishToCommandForClient({  tableNumber:tableNumber, clientNumber: clientIndex  }));
-    this.router.navigate(['/table-categories']);
+    this.store.dispatch(finishToCommandForClient({ tableNumber: tableNumber, clientNumber: clientIndex }));
+
+    this.currentClient$.pipe(
+      filter((client: ClientPosition | null) => client !== null),
+      take(1)
+    ).subscribe(() => {
+      this.router.navigate(['/table-categories']);
+    });
   }
 
   getTotal(): number {
