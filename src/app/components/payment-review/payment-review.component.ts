@@ -1,5 +1,5 @@
 import { Component, Inject, PLATFORM_ID, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import { HttpClient } from '@angular/common/http';  // Ajout de HttpClient pour charger un fichier JSON depuis le serveur
 import { CommonModule, CurrencyPipe, isPlatformBrowser } from '@angular/common';
 import { Store } from '@ngrx/store';  // Import NgRx Store
@@ -19,7 +19,8 @@ import {OrderDictionary} from "../table-reservation/table-reservation.component"
   standalone: true,
   imports: [
     CurrencyPipe,
-    CommonModule
+    CommonModule,
+    RouterLink
   ],
   styleUrls: ['./payment-review.component.scss']
 })
