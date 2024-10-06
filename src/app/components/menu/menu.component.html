@@ -1,48 +1,49 @@
-<div *ngIf="currentClient$|async as currentClient else commandFinished">
-  <app-header></app-header>
-  <div class="filter-buttons">
-    <button (click)="displayAllItems()">All</button>
-  </div>
-  <h4 class="title-center"> Table{{currentClient.tableNumber}}</h4>
-  <h4 class="title-center">P{{currentClient.clientNumber}}</h4>
+<div *ngIf="currentClient$|async as currentClient else commandFinished" class="example-container">
+  <mat-drawer-container  >
+    <mat-drawer class="side-bar" mode="side" opened>
+      <app-header></app-header>
+    </mat-drawer>
+    <mat-drawer-content class="side-bar-content">
+      <div class="menu-container">
+        <div class="row">
+          <div *ngFor="let item of items" class="col-12 col-sm-6 col-md-4 mb-4">
+            <app-menu-item
+              [item]="item"
+              (quantityChanged)="handleQuantityChange($event)"
+              [tableNUmber]="currentClient.tableNumber"
+              [clientNumber]="currentClient.clientNumber">
+            </app-menu-item>
+          </div>
+        </div>
 
-  <div class="menu-container">
-    <div *ngFor="let item of items" class="menu-item">
-      <app-menu-item
-        [item]="item"
-        (quantityChanged)="handleQuantityChange($event)">
-      </app-menu-item>
-
-      <div class="quantity-controls">
-        <button (click)="decreaseQuantity(currentClient.tableNumber,currentClient.clientNumber,item)">−</button>
-        <span>{{ item.quantity }}</span>
-        <button (click)="increaseQuantity(currentClient.tableNumber,currentClient.clientNumber,item)">+</button>
       </div>
+    </mat-drawer-content>
+
+  </mat-drawer-container>
+  <div >
+    <button  *ngIf="!(isTheFirst$ | async) " class="copyButton" (click)="openCopyModal(currentClient)" >
+      Copy the order
+    </button>
+    <div class="cart" *ngIf="cart.length > 0" (click)="onCartClick()" >
+      <h2>Your Cart</h2>
+      <div class="cart-items">
+        <div *ngFor="let item of cart">
+          <p>{{ item.fullName }} - Quantity: {{ item.quantity }}</p>
+        </div>
+      </div>
+      <p>Total: {{ getTotal() }} €</p>
+      <button (click)="validateCart(currentClient.tableNumber,currentClient.clientNumber)">Validate Cart</button>
     </div>
   </div>
 
-  <div class="cart" *ngIf="cart.length > 0" (click)="onCartClick()">
-    <h2>Your Cart</h2>
-    <div *ngFor="let item of cart">
-      <p>{{ item.fullName }} - Quantity: {{ item.quantity }}</p>
-    </div>
-    <p>Total: {{ getTotal() }} €</p>
-    <button (click)="validateCart(currentClient.tableNumber,currentClient.clientNumber)">Validate Cart</button>
-  </div>
-  <button mat-flat-button *ngIf="!(isTheFirst$ | async) " class="copyButton" (click)="openCopyModal(currentClient)" >
-    Copy the order
-  </button>
 
 </div>
-
-
-
 <ng-template #commandFinished>
   <div class="finishOrder">
     <mat-card class="finishContent">
       <mat-card-content >
         <h3>Order validated</h3>
-       <h3>Order Number:</h3>
+        <h3>Order Number:</h3>
         <h2>{{commandNumber}}</h2>
         <button routerLink="/">Ok</button>
       </mat-card-content>

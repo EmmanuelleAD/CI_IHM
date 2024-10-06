@@ -21,11 +21,12 @@ import {CommandDescriptionComponent} from "../command-description/command-descri
 import {MatButton} from "@angular/material/button";
 import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
 import {OrderService} from "../orderService";
+import {MatDrawer, MatDrawerContainer, MatDrawerContent} from "@angular/material/sidenav";
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, MenuItemComponent, HeaderComponent, MatDialogModule, MatButton, MatCard, MatCardHeader, MatCardContent, MatCardSubtitle, MatCardTitle, RouterLink],
+  imports: [CommonModule, MenuItemComponent, HeaderComponent, MatDialogModule, MatButton, MatCard, MatCardHeader, MatCardContent, MatCardSubtitle, MatCardTitle, RouterLink, MatDrawerContent, MatDrawer, MatDrawerContainer],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
