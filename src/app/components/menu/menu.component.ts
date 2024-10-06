@@ -50,6 +50,7 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
   constructor(  public menuServiceService: MenuServiceService,  private router: Router,public dialog: MatDialog,private  orderService:OrderService) {}
 
   ngOnInit() {
+    this.initializeCart();
 
   this.menuServiceService.items$.subscribe(
     (data: any) => {
@@ -63,7 +64,7 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
     }
   )
     this.commandNumber$.subscribe(cmdNumber=>this.commandNumber=cmdNumber)
-    this.loadCart();
+  // this.loadCart();
   }
 
   displayAllItems(){
@@ -120,10 +121,15 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
       this.cart = JSON.parse(storedCart);
     }
   }
+  initializeCart() {
+    console.log("hello")
+ this.updateLocalStorage()
+    }
 
   updateLocalStorage() {
     localStorage.setItem('cart', JSON.stringify(this.cart));
   }
+
 
 
   updateCart(item: MenuItem) {
@@ -143,6 +149,8 @@ switchMap((isFirstObservable: Observable<boolean>) => isFirstObservable)
 
   validateCart(tableNumber:number, clientIndex:number) {
     this.store.dispatch(finishToCommandForClient({ tableNumber: tableNumber, clientNumber: clientIndex }));
+    this.cart = [];
+    this.updateLocalStorage()
 
     this.currentClient$.pipe(
       filter((client: ClientPosition | null) => client !== null),
