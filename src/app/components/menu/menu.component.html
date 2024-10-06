@@ -9,10 +9,15 @@
           <div *ngFor="let item of items" class="col-12 col-sm-6 col-md-4 mb-4">
             <app-menu-item
               [item]="item"
-              (quantityChanged)="handleQuantityChange($event)"
+
               [tableNUmber]="currentClient.tableNumber"
               [clientNumber]="currentClient.clientNumber">
             </app-menu-item>
+            <div class="quantity-controls">
+              <button (click)="decreaseQuantity(currentClient.tableNumber,currentClient.clientNumber,item)" class="increase-button">−</button>
+              <p class="quantity">Quantity: {{ item.quantity }}</p>
+              <button (click)="increaseQuantity(currentClient.tableNumber,currentClient.clientNumber,item)" class="increase-button">+</button>
+            </div>
           </div>
         </div>
 
