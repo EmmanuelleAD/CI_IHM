@@ -10,11 +10,12 @@ import { TableService } from '../table.service';
 import {setCommands} from "../../stores/command.action";
 import {OrderService} from "../orderService";
 import {Store} from "@ngrx/store";
+import {MatIconButton} from "@angular/material/button";
 
 @Component({
   selector: 'app-customer-count',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, MatIconButton],
   templateUrl: './customer-count.component.html',
   styleUrl: './customer-count.component.css'
 })

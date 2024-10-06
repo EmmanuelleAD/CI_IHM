@@ -115,12 +115,12 @@ export class PaymentMethodComponent implements OnInit {
     console.log(tablePaid);
     console.log(tableObj);
     if (tablePaid) {
-      this.triggerAlert('Table déjà payée');
+      this.triggerAlert('table already paid');
     } else {
       this.closeAlert();
       this.selectedTables$.pipe(take(1)).subscribe({
         next: (selectedTables) => {
-          console.log('Tables sélectionnées:', selectedTables);
+          console.log('Selected Tables:', selectedTables);
           if (selectedTables.length === 1) {
             this.selectedTable = table;
             this.payAll = false;
