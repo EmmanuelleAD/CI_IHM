@@ -31,7 +31,7 @@
       <ng-container *ngFor="let client of selectedClients">
         <tr *ngFor="let item of client.items">
           <td>{{ client.client }}</td>
-          <td>{{ item.itemId }}</td>
+          <td>{{ item.shortName}}</td>
           <td>{{ item.quantity }}</td>
           <td>{{ item.price | currency:'EUR' }}</td>
           <td>{{ item.quantity * item.price | currency:'EUR' }}</td>

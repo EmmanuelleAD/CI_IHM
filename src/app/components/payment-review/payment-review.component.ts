@@ -3,12 +3,14 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';  // Ajout de HttpClient pour charger un fichier JSON depuis le serveur
 import { CommonModule, CurrencyPipe, isPlatformBrowser } from '@angular/common';
 import { Store } from '@ngrx/store';  // Import NgRx Store
-import { Observable } from 'rxjs';
+import {forkJoin, Observable, take} from 'rxjs';
 import {CommandState} from "../../stores/command.reducer";
 import {selectCommands} from "../../stores/command.selectors";
 import {map} from "rxjs/operators";
 import {Command} from "../../interfaces/Command";
-import {payForClient} from "../../stores/command.action";
+import {payForClient, setCommands} from "../../stores/command.action";
+import {OrderService} from "../orderService";
+import {OrderDictionary} from "../table-reservation/table-reservation.component";
 
 
 @Component({
@@ -33,7 +35,7 @@ export class PaymentReviewComponent implements OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: any,
-    private store: Store<{ commands: CommandState }>
+    private store: Store<{ commands: CommandState }>,private orderService:OrderService
   ) {
     // Récupérer les paramètres de l'URL (tableNumber et orderId)
     this.route.params.subscribe(params => {
@@ -45,15 +47,71 @@ export class PaymentReviewComponent implements OnInit {
 
     });
   }
-
   ngOnInit() {
     this.command$.subscribe(command => {
       if (command) {
+        console.log("Commande reçue :", command);
+
         this.selectedTable = command.tables.find((table: any) => +table.tableNumber === this.tableNumber);
-        console.log('Table mise à jour :', this.selectedTable);
+        console.log('Table sélectionnée :', this.selectedTable);
+
+        // Vérification si la table existe bien
+        if (!this.selectedTable) {
+          console.error("Table non trouvée pour le numéro de table:", this.tableNumber);
+          return;
+        }
+
+        // Itérer sur chaque client de la table pour récupérer les détails de la commande via le backend
+        this.selectedTable?.clients.forEach((client: any) => {
+          console.log('Client trouvé :', client);
+
+          if (client.orderId) {
+            console.log(`Récupération des détails de la commande pour le client avec orderId : ${client.orderId}`);
+            this.http.get(`http://localhost:3001/tableOrders/${client.orderId}`).subscribe({
+              next: (orderDetails: any) => {
+                console.log(`Détails de la commande reçus pour le client ${client.clientId}`, orderDetails);
+
+                client.items = []; // Initialiser les items pour le client
+                client.total = 0;  // Initialiser le total pour le client
+
+                // Itérer sur chaque ligne de commande pour récupérer les détails et le prix de chaque item
+                orderDetails.lines.forEach((item: any) => {
+                  this.http.get(`http://localhost:3000/menus/${item.item._id}`).pipe(take(1)).subscribe({
+                    next: (menuItem: any) => {
+                      console.log(`Détails du menu reçu pour l'item ${item.item._id}`, menuItem);
+
+                      // Ajouter les détails de l'item à la liste du client
+                      client.items.push({
+                        itemId: item.item._id,
+                        shortName: menuItem.shortName,
+                        quantity: item.howMany,
+                        price: menuItem.price || 0  // Utiliser un prix par défaut si absent
+                      });
+
+                      // Ajouter au total du client
+                      client.total += (menuItem.price || 0) * item.howMany;
+                      console.log(`Total actuel pour le client ${client.clientId} :`, client.total);
+                    },
+                    error: (error) => {
+                      console.error(`Erreur lors de la récupération du prix pour l'item ${item.item._id}`, error);
+                    }
+                  });
+                });
+              },
+              error: (error) => {
+                console.error(`Erreur lors de la récupération des détails de la commande pour le client ${client.clientId}`, error);
+              }
+            });
+          } else {
+            console.error(`Client sans orderId trouvé : ${client.clientId}`);
+          }
+        });
+      } else {
+        console.error('Aucune commande reçue.');
       }
     });
   }
+
 
   calculateClientTotal(client: any): number {
     if (!client.items || client.items.length === 0) {
@@ -79,6 +137,10 @@ export class PaymentReviewComponent implements OnInit {
     // Vérifie et traite le paiement pour chaque client sélectionné
     this.selectedClients.forEach(client => {
       const clientNumber = this.selectedTable.clients.indexOf(client) + 1;
+      console.log(`Paiement pour le client ${client.clientId}, clientNumber: ${clientNumber}`);
+
+      // Marquer le client comme payé localement
+      client.clientPaid = true;
 
       // Dispatch pour marquer le client comme payé dans le store
       this.store.dispatch(payForClient({
@@ -90,12 +152,16 @@ export class PaymentReviewComponent implements OnInit {
       this.processClientPayment(client);
     });
 
-    // Vérifier si tous les clients de la table ont payé et compléter le paiement de la table si c'est le cas
+    // Vérifier si tous les clients de la table ont payé
     const allClientsPaid = this.selectedTable.clients.every((client: any) => client.clientPaid);
+    console.log(`Tous les clients ont payé : ${allClientsPaid}`);
     if (allClientsPaid) {
       this.completeTablePayment();
+    } else {
+      console.log("Certains clients n'ont pas encore payé.");
     }
   }
+
 
 // Méthode pour facturer un client en fonction de son `orderId`
   processClientPayment(client: any): void {
@@ -104,7 +170,6 @@ export class PaymentReviewComponent implements OnInit {
         .subscribe({
           next: () => {
             console.log(`Client ${client.client} successfully paid.`);
-            // Si nécessaire, on peut réinitialiser l'interface ou effectuer une autre action ici.
           },
           error: (error) => {
             console.error(`Error processing payment for client ${client.client}:`, error);
@@ -115,27 +180,34 @@ export class PaymentReviewComponent implements OnInit {
     }
   }
 
-  // Cette méthode gère le paiement final et libère la table
   completeTablePayment() {
-    this.http.get(`http://localhost:3001/tableOrders?tableNumber=${this.tableNumber}`)
-      .subscribe((response: any) => {
-        if (response && response.length > 0) {
-          const tableOrderId = response[0]._id;  // Récupérer l'ID de la commande
+    console.log("Paiement final pour la table numéro", this.tableNumber);
 
-          // Deuxième requête pour facturer la table
+    this.http.get(`http://localhost:3001/tables/${this.tableNumber}`)
+      .subscribe((response: any) => {
+        console.log("Réponse reçue pour les informations de la table :", response);
+
+        if (response && response.tableOrderId) {
+          const tableOrderId = response.tableOrderId;
+          console.log("ID de la commande de la table :", tableOrderId);
+
+          // Requête pour facturer la table
           this.http.post(`http://localhost:3001/tableOrders/${tableOrderId}/bill`, {})
             .subscribe(() => {
-              console.log('Table successfully paid and closed');
+              console.log('La table a été facturée et fermée avec succès');
             }, error => {
-              console.error('Error during table payment:', error);
+              console.error('Erreur lors du paiement de la table:', error);
             });
         } else {
-          console.error('Table order not found');
+          console.error('ID de la commande pour la table non trouvé');
         }
       }, error => {
-        console.error('Error fetching table order:', error);
+        console.error('Erreur lors de la récupération des informations de la table:', error);
       });
   }
+
+
+
   isClientSelected(client: any): boolean {
     return this.selectedClients.includes(client);
   }
