@@ -157,7 +157,6 @@ this.serviceTable.createTableOrder(t.number,1).subscribe();
     this.repartirClientsSurTables(this.numberOfCustomers,this.tableNumberGlobal,4).subscribe(()=>{
       this.router.navigate(['/table-categories']).then(()=>this.orderService.filterAndOrganizeOrders(this.tableNumberGlobal.toString()).subscribe(ordersMap=>{
         this.store.dispatch(setCommands({orderDictionary:ordersMap,commandNumber:this.tableNumberGlobal}))
-        console.log("order",ordersMap)
       }));
 
     })

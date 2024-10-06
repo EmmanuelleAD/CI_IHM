@@ -42,7 +42,6 @@ export class CustomerCountComponent {
       this.http.get<Table[]>(this.serverLink + "dining/tables").subscribe({
         next: (response: Table[]) => {
           this.tables = response;
-          console.log(response);
           this.countEmptyTables = this.tables.filter(table => !table.taken).length;
         },
         error: (error: any) => {
